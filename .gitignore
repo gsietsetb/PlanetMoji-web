@@ -18,6 +18,14 @@
 .env.test.local
 .env.production.local
 
+*.lock
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/.gitignore
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/planetmoji-web.iml
+/.idea/vcs.xml
+/.eslintcache
