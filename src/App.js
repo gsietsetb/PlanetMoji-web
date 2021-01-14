@@ -1,25 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ *
+ * @format
+ * @flow strict-local
+ */
+import {extend} from 'consistencss';
+import {observer} from 'mobx-react-lite';
+import React from 'react';
+import {LogBox} from 'react-native';
+import {colors} from './gStyles';
+import {Navigator} from './routes';
+import {ProfileStore} from './stores/profileStore';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+LogBox.ignoreLogs(['Warning:', 'Running ', 'WARN', '[mobx] Out of bounds read']);
+LogBox.ignoreAllLogs();
 
+/**Mobx Persist
+ const hydrate = create({
+  storage: AsyncStorage,
+  jsonify: true,
+});
+ hydrate('profile', profile).then(() => console.log('someStore has been hydrated'));
+ */
+
+extend({colors: {...colors}});
+
+//export const profile = new ProfileStore();
+
+const App: () => React$Node = observer(() => <Navigator />);
 export default App;
