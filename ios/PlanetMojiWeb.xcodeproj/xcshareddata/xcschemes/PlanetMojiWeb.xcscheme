@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "PlanetMojiWeb.app"
+               BuildableName = "&#x1f30f; &#x1f17f;&#xfe0f;lanet &#x24c2;&#xfe0f;oji&#10;.app"
                BlueprintName = "PlanetMojiWeb"
                ReferencedContainer = "container:PlanetMojiWeb.xcodeproj">
             </BuildableReference>
@@ -55,7 +55,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "PlanetMojiWeb.app"
+            BuildableName = "&#x1f30f; &#x1f17f;&#xfe0f;lanet &#x24c2;&#xfe0f;oji&#10;.app"
             BlueprintName = "PlanetMojiWeb"
             ReferencedContainer = "container:PlanetMojiWeb.xcodeproj">
          </BuildableReference>
@@ -72,7 +72,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "PlanetMojiWeb.app"
+            BuildableName = "&#x1f30f; &#x1f17f;&#xfe0f;lanet &#x24c2;&#xfe0f;oji&#10;.app"
             BlueprintName = "PlanetMojiWeb"
             ReferencedContainer = "container:PlanetMojiWeb.xcodeproj">
          </BuildableReference>

@@ -1,5 +1,4 @@
 import C, {apply} from 'consistencss';
-import _ from 'lodash';
 import React from 'react';
 import {Text, TouchableOpacity, View} from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -24,9 +23,9 @@ export default ({
   const isCurrent = currCellId === index;
   const {icon, isEvil, unit, building} = item;
   /*console.log('item: ', item);*/
-  const shouldHighlight = !_.isEmpty(unit) || !_.isEmpty(unit);
+  const shouldHighlight = !!unit || !!building;
   return (
-    <TouchableOpacity activeOpacity={0.7} style={[{opacity: opacity}, size]} onPress={onPress} opacity={opacity}>
+    <TouchableOpacity activeOpacity={0.7} /*style={[{opacity: opacity}, size]}*/ onPress={onPress} opacity={opacity}>
       <FastImage
         source={img}
         opacity={opacity}
@@ -37,23 +36,22 @@ export default ({
           bgColor(bg),
           C.itemsCenter,
           C.justifyCenter,
+          {opacity: opacity},
           isCurrent && bordColor(selColor, 2),
         )}
       />
-      <Text
-        style={apply(
-          iconSize,
-          /*size,*/
-          C.selfCenter,
-          C.textCenter,
-          C.justifyCenter,
-          bgColor(shouldHighlight && (isEvil ? colors.salmon + '90' : colors.blue + '90')),
-          shouldHighlight && C.radius8,
-          shouldHighlight && C.p1,
-          wrapStyle,
-        )}>
-        {icon}
-      </Text>
+      <View style={apply(size)}>
+        <Text
+          style={apply(
+            iconSize,
+            shadow(shouldHighlight && (isEvil ? 'red' : 'blue')),
+            shouldHighlight && C.radius8,
+            shouldHighlight && C.p1,
+            wrapStyle,
+          )}>
+          {icon}
+        </Text>
+      </View>
       {/**Badge*/}
       {showRes && item.availResources && (
         <View style={badgeWrapper}>

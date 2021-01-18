@@ -36,7 +36,7 @@ export default observer(() => {
                 }
               : imgs.europeWest
           }
-          style={apply(C.top_12, C.wFull, {width: deviceWidth, height: deviceHeight})}>
+          style={apply(isIOS && C.top_12, C.wFull, {width: deviceWidth, height: deviceHeight})}>
           <FlatList
             data={currentBoard.cells}
             style={apply(C.radius2, isIOS && C.top_12 /*!isWeb && minH100(1.2)*/)}
@@ -48,7 +48,7 @@ export default observer(() => {
               <Cell /*img={isWeb ? imgs.grassText : imgs.grass}*/ /*bg={item.bg}*/ ///*index % 5 === 0 ?*/ item.icon ? colors.groundSand : colors.sand} //item.boardMap.terrain.bg}
                 opacity={isIOS ? 0.7 : 0.6} //!isWeb && europeAllow.includes(index) ? 0.75 : 0.6}
                 bg={isIOS ? colors.water : colors.groundSand}
-                img={isIOS ? imgs.grass : imgs.grassGround}
+                img={isIOS ? imgs.grass : imgs.grassCut}
                 index={index}
                 showFlag
                 onPress={() => {

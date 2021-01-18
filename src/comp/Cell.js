@@ -1,7 +1,7 @@
 import C, {apply} from 'consistencss';
 import React from 'react';
-import {ImageBackground, Text, TouchableOpacity, View} from 'react-native-web';
-import {badgeWrapper, bgColor, bordColor, cell, colors, shadow, textSize} from '../gStyles';
+import {Image, Text, TouchableOpacity, View} from 'react-native';
+import {badgeWrapper, bgColor, bordColor, cell, colors, isIOS, shadow, textSize} from '../gStyles';
 
 export default ({
   item,
@@ -20,22 +20,37 @@ export default ({
   onPress,
 }) => {
   const isCurrent = currCellId === index;
-  const {icon} = item;
+  const {icon, isEvil, unit, building} = item;
+  /*console.log('item: ', item);*/
+  const shouldHighlight = !!unit || !!building;
   return (
-    <TouchableOpacity activeOpacity={0.2} /*style={{opacity: opacity}}*/ onPress={onPress}>
-      <ImageBackground
+    <TouchableOpacity activeOpacity={0.7} /*style={[{opacity: opacity}, size]}*/ onPress={onPress} opacity={opacity}>
+      <Image
         source={img}
+        opacity={opacity}
+        resizeMode={isIOS ? 'center' : 'center'}
         style={apply(
           size,
+          C.absolute,
           bgColor(bg),
           C.itemsCenter,
           C.justifyCenter,
           {opacity: opacity},
           isCurrent && bordColor(selColor, 2),
-        )}>
-        {/*<Text style={C.absolute}>{JSON.stringify(item.bg)}</Text>*/}
-        <Text style={apply(iconSize, wrapStyle)}>{icon}</Text>
-      </ImageBackground>
+        )}
+      />
+      <View style={apply(size)}>
+        <Text
+          style={apply(
+            iconSize,
+            shadow(shouldHighlight && (isEvil ? 'red' : 'blue')),
+            shouldHighlight && C.radius8,
+            shouldHighlight && C.p1,
+            wrapStyle,
+          )}>
+          {icon}
+        </Text>
+      </View>
       {/**Badge*/}
       {showRes && item.availResources && (
         <View style={badgeWrapper}>
@@ -43,7 +58,7 @@ export default ({
         </View>
       )}
       {showFlag && item.flag && (
-        <View style={badgeWrapper}>
+        <View style={apply(C.absolute, C.bottom1, C.right1, C.bgWhite, C.radius2)}>
           <Text style={apply(textSize.Xs, shadow(colors.sand, 5))}>{item.flag}</Text>
         </View>
       )}

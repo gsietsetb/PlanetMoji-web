@@ -105,6 +105,7 @@ export const imgs = {
   water: {uri: 'https://forums.submit.shutterstock.com/gallery/image/8278-waterpng'},
   water2: {uri: 'https://toppng.com/uploads/preview/water-texture-water-11562884439s4ftxqmf62.png'},
   water3: {uri: 'https://www.3dxo.com/images/textures/s/water_079_c_0085.jpg'},
+  grassCut: {uri: 'https://i.ibb.co/PQCv9LJ/grassCut.png'},
   grassText: {uri: 'https://opengameart.org/sites/default/files/oga-textures/79629/256x%20grass%20overlay.png'},
   earth: {uri: 'https://storage3d.com/storage/2007.11/007a5a96f055a4cbef45c5783e6746e0.jpg'},
   grassText2: {
