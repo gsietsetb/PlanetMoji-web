@@ -7,7 +7,7 @@ import {profile} from '../App';
 import AddCard from '../comp/AddCard';
 import {ResourcesMap, StatsMap} from '../comp/Box';
 import Cell from '../comp/Cell';
-import {absCenter, cell, deviceHeight, deviceWidth, imgs, isWeb, minH100, textSize} from '../gStyles';
+import {absCenter, cell, deviceHeight, deviceWidth, imgs, isIOS, isWeb, minH100, textSize} from '../gStyles';
 import {nav, screens} from '../routes';
 import {buildingsMap} from '../stores/sets';
 
@@ -17,24 +17,26 @@ const cat =
 export default observer(() => {
   const currentBoard = profile.boards.villageMap;
   const useNav = !isWeb && useNavigation();
-  const columns = Math.floor(deviceWidth / (16 * 4));
+  const columns = Math.ceil(deviceWidth / (13 * 4));
   return (
-    <SafeAreaView style={apply(C.py8, C.flex, C.bgPaleGrey)}>
+    <SafeAreaView style={apply(C.py8, C.flex, C.bgWater)}>
       {currentBoard && (
         <ImageBackground
           imageStyle={{resizeMode: 'cover'}}
-          source={{uri: america}}
+          source={{uri: cat}}
           style={apply(C.top_12, C.wFull, {width: deviceWidth, height: deviceHeight})}>
           <FlatList
             data={currentBoard.cells}
-            style={apply(C.radius2, C.bgWater, C.top_12, !isWeb && minH100(1.2))}
-            numColumns={/*isWeb ? columns - 1 :*/ columns}
+            style={apply(C.radius2, C.top_12, !isWeb && minH100(1.2))}
+            numColumns={columns} ///*isWeb ? columns - 1 :*/ xCells(isWeb ? 24 : 16)}
+            scrollEnabled={false}
+            /* withFlex*/
             extraData={currentBoard.currCellId}
             renderItem={({item, index}) => (
               <Cell
-                img={imgs.grassText}
-                size={cell.XL}
-                opacity={0.4}
+                img={isIOS ? imgs.grass : imgs.grassCut}
+                size={cell.L}
+                opacity={0.7}
                 iconSize={textSize.L}
                 index={index}
                 onPress={() => {
@@ -60,7 +62,12 @@ export default observer(() => {
           horizontal
           extraData={profile.level}
           renderItem={({item, index}) => (
-            <AddCard list={buildingsMap} index={index} item={item} onSet={() => profile.buyBuilding(item)} />
+            <AddCard
+              list={buildingsMap}
+              index={index}
+              item={item}
+              onSet={() => profile.buyBuilding(item, profile.boards.villageMap)}
+            />
           )}
         />
         {/*<AddEmojiModal />*/}

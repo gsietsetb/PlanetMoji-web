@@ -2,15 +2,15 @@ import C, {apply, extend} from 'consistencss';
 import {autorun} from 'mobx';
 import {observer} from 'mobx-react-lite';
 import React from 'react';
-import {LogBox, SafeAreaView, ScrollView} from 'react-native';
+import {SafeAreaView, ScrollView} from 'react-native';
 import AddEmojiModal from './comp/AddEmojiModal';
 import {bgColor, colors, deviceHeight} from './gStyles';
 import {screens, WebNavigation} from './routes';
 import {CollectFruit} from './screens/Harvest';
 import {ProfileStore} from './stores/profileStore';
 
-LogBox.ignoreLogs(['Warning:', 'Running ', 'WARN', '[mobx] Out of bounds read']);
-LogBox.ignoreAllLogs();
+/*LogBox.ignoreLogs(['Warning:', 'Running ', 'WARN', '[mobx] Out of bounds read']);
+LogBox.ignoreAllLogs();*/
 
 /**Mobx Persist
  const hydrate = create({

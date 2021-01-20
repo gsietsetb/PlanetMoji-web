@@ -5,7 +5,7 @@
 ## React-native
 
 by Guillermo Sierra
-![PlanetMoji](./src/assets/mockup.png)
+![PlanetMoji](./src/assets/mockup2.png)
 
 ## Inventory creator
 

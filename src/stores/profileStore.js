@@ -65,7 +65,7 @@ export const ProfileStore = (isIA = false, level = 1) =>
     enemy: {},
 
     /**todo move to board*/
-    collected: {'💎': 0, '🪵': 0, '🥩': 0, '🪨': 0, '⭐️': 0},
+    collected: {'💎': 0, '🪵': 0, '🥩': 0, '🪨': 0, '🔥': 0},
     buildingsList: [],
     /*enemyUnits: _.range(level - 1).map((item) =>
                                                                                                                                                                                                                                                               Object.keys(unitsMap).map((currItem) => profile.battle.setCellIcon(currItem)),
@@ -112,26 +112,26 @@ export const ProfileStore = (isIA = false, level = 1) =>
 
       /**Add to board*/
       //board.setCellIcon(buildIcon, false, undefined, true);
-      board.setCell({building: buildIcon});
+      board.setCell({buildIcon, overwrite: false});
     },
 
     /**Units*/
-    buyUnit(unit, board = this.boards.battleMap) {
+    buyUnit(unitIcon, board = this.boards.battleMap) {
       if (this.populationExceeded) {
         Alert.alert(
           'Population exceded: ' + this.currPopulation + ' / ' + this.maxPopulation,
           'Please get more score so you can achieve next population level',
         );
       } else {
-        this.addUnit(unit);
-        const {cost, score} = unitsMap[unit];
+        this.addUnit(unitIcon);
+        const {cost, score} = unitsMap[unitIcon];
         /**Deduce resources*/
         Object.entries(cost).map(([res, currCost]) => (this.resources[res] -= currCost));
         /**Update score*/
         this.score += score;
 
         /**Add to board*/
-        board.setCell({unit: unit, overwrite: false});
+        board.setCell({unitIcon: unitIcon, overwrite: false});
 
         /* board.setCellIcon(unit, false, undefined, false, true);*/
       }
@@ -142,13 +142,13 @@ export const ProfileStore = (isIA = false, level = 1) =>
     },
     addUnitsBoard(board = this.boards.battleMap) {
       Object.entries(this.units).map(([key, value]) =>
-        _.range(value).map((item) => board.setCell({unit: key, overwrite: false})),
+        _.range(value).map((item) => board.setCell({unitIcon: key, overwrite: false})),
       );
     },
     addEnemies(num = 16) {
       for (let i = 0; i < num; i++) {
         this.boards.battleMap.setCell({
-          unit: pickRandom(Object.keys(unitsMap), 1),
+          unitIcon: pickRandom(Object.keys(unitsMap), 1),
           overwrite: false,
           id: 15,
           isEvil: true,
@@ -157,7 +157,7 @@ export const ProfileStore = (isIA = false, level = 1) =>
     },
     collect(resource, val) {
       const combo = Math.pow(2, val);
-      if (resource === setIcon('⭐️')) {
+      if (resource === setIcon('🔥')) {
         this.score += combo;
       } else if (resource === '🔥') {
         this.score += combo * 2;

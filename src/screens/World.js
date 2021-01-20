@@ -11,6 +11,7 @@ import AddCard from '../comp/AddCard';
 import {ResourcesMap, StatsMap} from '../comp/Box';
 import Cell from '../comp/Cell';
 import {absCenter, cell, colors, deviceHeight, deviceWidth, imgs, isIOS, isSmall, isWeb, textSize} from '../gStyles';
+import {xCells} from '../stores/boardStore';
 import {buildingsMap} from '../stores/sets';
 
 export default observer(() => {
@@ -20,7 +21,7 @@ export default observer(() => {
 
   useEffect(() => {
     /*currentBoard.shuffle(true);*/
-    currentBoard.setCell({building: '🛖', isEvil: true, id: 96});
+    currentBoard.setCell({buildIcon: '🛖', isEvil: true, id: 98});
     /**Set Water*/
     /*getAdjacentsIds(76).map((item) => currentBoard.setCell({overwrite: false, terrain: terrains['🌊'], icon: '🌊'}));*/
   }, [currentBoard]);
@@ -29,24 +30,18 @@ export default observer(() => {
       {currentBoard && (
         <ImageBackground
           imageStyle={{resizeMode: 'cover'}}
-          source={
-            isWeb
-              ? {
-                  uri: 'https://www.pngkey.com/png/full/205-2054388_792px-blank-map-europe-no-borders-europe-map.png',
-                }
-              : imgs.europeWest
-          }
+          source={isWeb ? imgs.europeWeb : imgs.europeWest}
           style={apply(isIOS && C.top_12, C.wFull, {width: deviceWidth, height: deviceHeight})}>
           <FlatList
             data={currentBoard.cells}
             style={apply(C.radius2, isIOS && C.top_12 /*!isWeb && minH100(1.2)*/)}
-            numColumns={Math.ceil(deviceWidth / (13 * 4))}
+            numColumns={xCells()}
             scrollEnabled={false}
             extraData={currentBoard.currCellId}
             keyExtractor={(item) => item.id}
             renderItem={({item, index}) => (
               <Cell /*img={isWeb ? imgs.grassText : imgs.grass}*/ /*bg={item.bg}*/ ///*index % 5 === 0 ?*/ item.icon ? colors.groundSand : colors.sand} //item.boardMap.terrain.bg}
-                opacity={isIOS ? 0.7 : 0.6} //!isWeb && europeAllow.includes(index) ? 0.75 : 0.6}
+                opacity={isWeb ? 0.55 : isIOS ? 0.7 : 0.6} //!isWeb && europeAllow.includes(index) ? 0.75 : 0.6}
                 bg={isIOS ? colors.water : colors.groundSand}
                 img={isIOS ? imgs.grass : imgs.grassCut}
                 index={index}

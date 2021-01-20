@@ -57,7 +57,7 @@ export const iconSizeBig = isBig ? C.font16 : C.font12;
 export const textSize = {
   Xs: isBig ? C.font4 : C.font3,
   Sm: isBig ? C.font6 : C.font4,
-  Md: isBig ? C.font9 : C.font6,
+  Md: isBig ? C.font9 : C.font8,
   L: isBig ? C.font14 : C.font10,
   XL: isBig ? C.font16 : C.font13,
 };
@@ -66,7 +66,7 @@ export const cell = {
   Sm: apply(isBig ? [C.w17, C.w17, C.flex, C.minh17] : [C.w12, C.h12]), // 17 & 12
   Md: apply(isBig ? [C.w20, C.w20, C.flex, C.minh20] : [C.w13, C.h13]), // 20 & 13
   L: apply(isBig ? [C.w22, C.w22, C.flex, C.minh22] : [C.w13, C.h13]), // 22 & 14
-  XL: apply(isBig ? [C.w24, C.w24, C.flex, C.minh24] : [C.w16, C.h16]), // 24 & 14
+  XL: apply(isBig ? [C.w24, C.w24, C.flex, C.minh24] : [C.w18, C.h18]), // 24 & 14
 };
 
 export const emptyStateURL = 'https://orbit.kiwi/files/EmptyState-attempt-at-joke.png';
@@ -79,7 +79,8 @@ export const absCenter = [
   !isSmall && [C.right0, C.left0],
 ];
 export const darkShadow = boxShadow(1, 0, 1, 8, colors.black40, 1);
-export const shadow = (col = colors.paleGreyThree, blur = 5, opacity = 1) => boxShadow(blur, 1, 1, blur, col, opacity);
+export const shadow = (col = colors.paleGreyThree, blur = 5, opacity = 1) =>
+  isIOS && boxShadow(blur, 1, 1, blur, col, opacity);
 
 export const topBorder = {
   borderTopRightRadius: 8,
@@ -89,6 +90,9 @@ export const topBorder = {
 export const imgs = {
   europe: require('./assets/europe.png'),
   europeWest: require('./assets/europeSp.png'),
+  europeWeb: {
+    uri: 'https://www.pngkey.com/png/full/205-2054388_792px-blank-map-europe-no-borders-europe-map.png',
+  },
   grass: require('./assets/grass.png'),
   farm2: require('./assets/farm.png'),
   barrack: require('./assets/barrack.png'),

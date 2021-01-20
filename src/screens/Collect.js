@@ -17,15 +17,22 @@ export default observer(
     ExtraComp,
     showCombo = true,
     withBonus = false,
-    isResource = false,
+    isResource = true,
   }) => {
-    const {promotedDiag, harvestCombo, validMatch, cells, remMoves, remShuffles, remBombs} = currentBoard;
+    const {promotedDiag, harvestCombo, cells, remMoves, remShuffles, remBombs} = currentBoard;
     const [showMatching, setShowMatching] = useState(false);
     const {goBack} = !isWeb && useNavigation();
 
     const tryCollect = (index, icon) => {
       currentBoard.setCurrent(index);
-      if (validMatch) {
+      console.log(
+        'VeryHigh ,',
+        currentBoard.validMatch,
+        currentBoard.matchRecursiveAdjIds,
+        currentBoard.adjacentIds,
+        currentBoard.adjacentDiagIds,
+      );
+      if (currentBoard.validMatch) {
         blinkBg(() => currentBoard.collectCells(icon, isResource));
       }
     };
@@ -57,17 +64,18 @@ export default observer(
                 size={cell.XL}
                 iconSize={textSize.L}
                 bg={colors.white}
+                withFlex
                 withTransp={false}
                 currCellId={currentBoard.currCellId}
                 wrapStyle={[
                   C.px1,
                   bordColor(colors.water, 0.5),
-                  currentBoard.mathchingRecurisiveAdjacentIds.includes(index) && C.bgRed,
                   C.radius2,
-                  shadow(colors.blue, showMatching && currentBoard.shouldHighlight(index) ? 14 : 3),
+                  isIOS &&
+                    shadow(colors.blue, showMatching && currentBoard.shouldHighlight(index) ? (isIOS ? 14 : 0) : 3),
                 ]}
                 index={index}
-                onPress={() => currentBoard.setCurrent(index)} //remMoves > 0 && tryCollect(index, item.icon)}
+                onPress={() => remMoves > 0 && tryCollect(index, item.icon)}
                 item={item}
               />
             )}

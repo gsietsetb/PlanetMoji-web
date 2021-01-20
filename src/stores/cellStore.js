@@ -5,11 +5,11 @@ import {boardsMap} from './boardStore';
 import {buildingsMap, natureToResource, terrains, unitsMap} from './sets';
 import {pickRandom} from './utils';
 
-export const UnitStore = (unit = '👩‍🌾', pos, isEvil = false) =>
+export const UnitStore = (unitIcon = '👩‍🌾', pos, isEvil = false) =>
   makeAutoObservable({
     id: nanoid(6),
-    unit: unitsMap[unit],
-    icon: unit,
+    unit: unitsMap[unitIcon],
+    icon: unitIcon,
     cellPos: pos,
     isEvil: isEvil,
     /*currLife: unit?.skills['❤️'] || 100,*/
@@ -58,9 +58,9 @@ export const CellStore = ({
   boardMap = boardsMap.WORLD,
   unit,
   building,
-  terrain = terrains['🌲'],
-  img = terrain.img,
-  bg = terrain.bg,
+  terrain /*terrains['🌲']*/,
+  img /*terrain.img*/,
+  bg /*terrain.bg*/,
   badge,
   flag,
   isPressable = true, //id % 6 !== 0,
@@ -105,17 +105,22 @@ export const CellStore = ({
     get availResources() {
       return /*this.taskReady*/ this.id % 7 === 0 && natureToResource(this.icon);
     },
-    setIcon(newIcon, price = 600) {
+    setIcon(newIcon) {
       this.icon = newIcon;
     },
     setEvil(isCurrEvil = true) {
       this.isEvil = isCurrEvil;
     },
-    setUnit(newUnit = true, isNewEvil = newUnit.isEvil, newFlag = profile.flag) {
+    setUnit(newUnit, isNewEvil = newUnit.isEvil, newFlag = profile.flag) {
       this.unit = newUnit;
       this.icon = newUnit.icon;
       this.isEvil = isNewEvil;
       this.flag = newFlag;
+    },
+    clearCell() {
+      this.unit = undefined;
+      this.icon = '';
+      this.isEvil = false;
     },
     setBuilding(newBuild = true, isNewEvil = newBuild.isEvil, newFlag = profile.flag) {
       this.building = newBuild;
@@ -128,7 +133,4 @@ export const CellStore = ({
       this.icon = pickRandom(newTerrain.icons, 0.3);
       this.img = newTerrain.img;
     },
-    /*setResources(resource) {
-      this.availResources = resource;
-    },*/
   });

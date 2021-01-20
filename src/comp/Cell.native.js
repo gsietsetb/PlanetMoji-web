@@ -17,6 +17,7 @@ export default ({
   selColor = colors.water,
   showRes = false,
   showFlag = false,
+  withFlex = false,
   wrapStyle,
   onPress,
 }) => {
@@ -26,27 +27,29 @@ export default ({
   const shouldHighlight = !!unit || !!building;
   return (
     <TouchableOpacity activeOpacity={0.7} /*style={[{opacity: opacity}, size]}*/ onPress={onPress} opacity={opacity}>
-      <FastImage
-        source={img}
-        opacity={opacity}
-        resizeMode={isIOS ? 'center' : 'center'}
-        style={apply(
-          size,
-          C.absolute,
-          bgColor(bg),
-          C.itemsCenter,
-          C.justifyCenter,
-          {opacity: opacity},
-          isCurrent && bordColor(selColor, 2),
-        )}
-      />
-      <View style={apply(size)}>
+      {img && (
+        <FastImage
+          source={img}
+          opacity={opacity}
+          resizeMode={isIOS ? 'center' : 'center'}
+          style={apply(
+            size,
+            C.absolute,
+            bgColor(bg),
+            C.itemsCenter,
+            C.justifyCenter,
+            {opacity: opacity},
+            isCurrent && bordColor(selColor, 2),
+          )}
+        />
+      )}
+      <View style={apply(withFlex ? C.flex : size)}>
         <Text
           style={apply(
             iconSize,
-            shadow(shouldHighlight && (isEvil ? 'red' : 'blue')),
-            shouldHighlight && C.radius8,
-            shouldHighlight && C.p1,
+            isIOS && shadow(shouldHighlight && (isEvil ? 'red' : 'blue')),
+            /*shouldHighlight && C.radius8,
+            shouldHighlight && C.p1,*/
             wrapStyle,
           )}>
           {icon}

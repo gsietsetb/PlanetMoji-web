@@ -2,32 +2,17 @@ import _ from 'lodash';
 import {makeAutoObservable} from 'mobx';
 import {nanoid} from 'nanoid/non-secure';
 import {profile} from '../App';
-import {isWeb} from '../gStyles';
+import {deviceHeight, deviceWidth, isBig, isWeb} from '../gStyles';
 import {BuildingStore, CellStore, UnitStore} from './cellStore';
-import {
-  buildingsMap,
-  europeAllow,
-  flowers,
-  fruits,
-  harvest,
-  mountains,
-  terrains,
-  tools,
-  trees,
-  unitsMap,
-  water,
-} from './sets';
-import {
-  chessColor,
-  getAdjacentDiagIds,
-  getAdjacentsIds,
-  matchingRecursiveAdjacentIds,
-  pickRandom,
-  unique,
-} from './utils';
+import {europeAllow, farm, flowers, fruits, harvest, mountains, tools, trees, unitsMap} from './sets';
+import {chessColor, getAdjacentDiagIds, getAdjacentsIds, matchRecursiveAdjCells, pickRandom, unique} from './utils';
 
-export const WORLD_SIZE = isWeb ? 24 : 12;
-export const VILLAGE_SIZE = 10;
+export const xCells = (cellSize = 13) => Math.ceil(deviceWidth / (cellSize * 4));
+export const yCells = (cellSize = 13) => Math.ceil((deviceHeight * 0.9) / (cellSize * 4));
+
+const VILLAGE_CELL_SIZE = isBig ? 24 : 16;
+export const WORLD_SIZE = isWeb ? /*xCells * xCells*/ 20 * 20 : 13; // xCells * yCells; //
+export const VILLAGE_SIZE = /*isWeb ?*/ xCells(VILLAGE_CELL_SIZE) * yCells(VILLAGE_CELL_SIZE);
 export const CHESS_SIZE = 8;
 
 export const modalStore = (show = false) =>
@@ -49,22 +34,25 @@ export const boardsMap = {
   WORLD: {
     id: 1,
     startingCell: 27,
-    img: () => (Math.random() > 0.2 ? terrains['🌲'] : pickRandom(terrains, 1)),
-    terrain: () => (Math.random() > 0.2 ? terrains['🌲'] : pickRandom(terrains, 1)),
+    /*img: () => (Math.random() > 0.2 ? terrains['🌲'] : pickRandom(terrains, 1)),
+    terrain: () => (Math.random() > 0.2 ? terrains['🌲'] : pickRandom(terrains, 1)),*/
     icon: (cellId, terrain) =>
       /*terrain === terrains['🌊']
         ? pickRandom(water, 0.2)
-        :*/ europeAllow.includes(cellId) || isWeb
-        ? pickRandom(mountains, 0.2)
-        : pickRandom(water, 0.2),
+        :*/ (europeAllow.includes(cellId) || isWeb) &&
+      pickRandom(mountains, 0.2),
+    /*: pickRandom(water, 0.2),*/
     /*Math.random() > 0.1
         ?*/
     /*: pickRandom(nature, 0.25)*/
   },
-  VILLAGE: {id: 2, icon: (terrain) => pickRandom(trees.concat(flowers, mountains, Object.keys(buildingsMap)), 0.2)},
+  VILLAGE: {
+    id: 2,
+    icon: (terrain) => pickRandom(trees.concat(flowers, farm, trees /*, Object.keys(buildingsMap)*/), 0.2),
+  },
   BATTLE: {
     id: 3,
-    terrain: (cellId) => chessColor(cellId),
+    bg: (cellId) => chessColor(cellId),
     icon: (cellId) => cellId > 16 && cellId < 48 && pickRandom(trees, 0.2),
   },
 
@@ -123,17 +111,22 @@ export const BoardStore = (boardMap = boardsMap.WORLD, size = CHESS_SIZE, isEmpt
     },
 
     shouldHighlight(cellIndex) {
-      return this.shouldExplodeAll ? this.cells[cellIndex] === this.promotedDiag : this.mathchingRecurisiveAdjacentIds;
+      return this.shouldExplodeAll
+        ? this.cells[cellIndex] === this.promotedDiag
+        : this.matchRecursiveAdjIds.includes(cellIndex);
     },
 
-    recruit(matchIcon = '🔥') {
-      const comboSize = this.mathchingRecurisiveAdjacentIds.length;
+    recruit(matchIcon) {
+      const comboSize = this.matchRecursiveAdjIds.length;
       profile.addUnit(matchIcon, comboSize - 2);
-      this.reassignCells({newIcons: Object.keys(unitsMap), currIcon: matchIcon});
+      this.reassignCells({newIcons: Object.keys(unitsMap).filter((key) => key === matchIcon), currIcon: matchIcon});
       this.remMoves--;
     },
     collectCells(matchIcon = '🔥', isResource) {
-      const comboSize = this.mathchingRecurisiveAdjacentIds.length;
+      console.log('re', matchIcon, isResource);
+      const comboSize = this.matchRecursiveAdjIds.length;
+      console.log('cobmo', comboSize, this.matchRecursiveAdjIds);
+
       /**Updates harvestCombo*/
       if (comboSize > 6) {
         this.addMoves(comboSize - 6);
@@ -141,8 +134,9 @@ export const BoardStore = (boardMap = boardsMap.WORLD, size = CHESS_SIZE, isEmpt
           this.setComboRecord(comboSize, matchIcon);
         }
       }
+      console.log('this was also fine! :ok: ', comboSize);
       profile.harvestResource(matchIcon, comboSize, isResource);
-      this.reassignCells({currIcon: matchIcon}, !isResource && fruits);
+      this.reassignCells({currIcon: matchIcon, newIcons: isResource ? harvest : fruits});
       isResource && this.remMoves--;
     },
 
@@ -159,21 +153,16 @@ export const BoardStore = (boardMap = boardsMap.WORLD, size = CHESS_SIZE, isEmpt
       this.currCellId = cellId > 0 ? cellId : 0;
     },
 
-    get mathchingRecurisiveAdjacentIds() {
+    get matchRecursiveAdjIds() {
       return unique(
-        matchingRecursiveAdjacentIds(
-          this.currCellId,
-          size,
-          this.cells,
-          boardsMap.withDiag || this.currCell.icon === '💎',
-        ),
+        matchRecursiveAdjCells(this.currCellId, size, this.cells, boardsMap.withDiag || this.currCell.icon === '💎'),
       );
     },
     get validMatch() {
-      return this.mathchingRecurisiveAdjacentIds.length > 2;
+      return this.matchRecursiveAdjIds.length > 2;
     },
-    get isCurrWarrior() {
-      return !!unitsMap[this.currCell.icon];
+    get isCurrUnit() {
+      return !!this.currCell.unit;
     },
     get isCurrEvil() {
       return this.currCell.isEvil;
@@ -184,18 +173,26 @@ export const BoardStore = (boardMap = boardsMap.WORLD, size = CHESS_SIZE, isEmpt
         1,
       );
     },
-    reassignCells({cells = this.mathchingRecurisiveAdjacentIds, newIcons = harvest, currIcon = '🔥'}) {
-      cells.map((cur) =>
-        this.setCellIcon(
+    reassignCells({cells = this.matchRecursiveAdjIds, newIcons = harvest, currIcon = '🔥'}) {
+      console.log('ogingt to cargarme: ', cells, newIcons, currIcon);
+      cells.map((cur) => {
+        console.log(
+          'oim ina loop:: ',
+          cur,
           pickRandom(
             newIcons.filter((icon) => icon !== currIcon),
             1,
           ),
-          true,
-          cur,
-        ),
-      );
-      // profile.harvestResource(icon, this.mathchingRecurisiveAdjacentIds.length);
+        );
+        this.setCell({
+          icon: pickRandom(
+            newIcons.filter((icon) => icon !== currIcon),
+            1,
+          ),
+          overwrite: true,
+          id: cur,
+        });
+      });
     },
     findNextEmpty(id) {
       let pos = id;
@@ -212,74 +209,46 @@ export const BoardStore = (boardMap = boardsMap.WORLD, size = CHESS_SIZE, isEmpt
       id = this.currCellId,
       overwrite = true,
       terrain /*= terrains['🌲']*/,
-      unit,
-      building,
+      unitIcon,
+      buildIcon,
       isEvil = false,
     }) {
       const pos = overwrite ? id : this.findNextEmpty(id);
+      const currCell = this.cells[pos];
+      console.log('setting', icon, id, currCell, unitIcon, pos, id, overwrite, this.findNextEmpty(id));
       if (icon) {
-        this.cells[pos].setIcon(icon);
+        currCell.setIcon(icon);
       }
-      if (unit) {
-        this.cells[pos].setUnit(UnitStore(unit, pos, isEvil));
+      if (unitIcon) {
+        currCell.setUnit(UnitStore(unitIcon, pos, isEvil));
       }
-      if (building) {
-        this.cells[pos].setBuilding(BuildingStore(building, pos, isEvil));
+      if (buildIcon) {
+        currCell.setBuilding(BuildingStore(buildIcon, pos, isEvil));
       }
       if (terrain) {
-        this.cells[pos].setTerrain(terrain);
-      }
-    },
-    setCellIcon(icon, overwrite = false, id = this.currCellId, isEvil = false, isUnit = false) {
-      const pos = overwrite ? id : this.findNextEmpty(id);
-      /*if (overwrite) {
-        this.cells[pos].setIcon(icon);
-      } else if (this.cells[pos]) {
-          pos = this.findNextEmpty(id)*/
-      /*while (!overwrite && !!this.cells[pos].icon && pos >= 0) {
-          pos--;
-          if (pos < 0) {
-            pos = size * size - 1;
-          }
-        }*/
-      this.cells[pos].setIcon(icon);
-      overwrite && this.setCurrent(pos - 1);
-
-      this.cells[pos].setUnit(isUnit);
-      if (isUnit) {
-        this.cells[pos].setEvil(isEvil);
+        currCell.setTerrain(terrain);
       }
     },
     randomMove() {
-      //id = this.randomEnemy, isEvil = true) {
-      const enemies = this.cells.filter(({icon, isUnit, isEvil, isCurrEvil}) => {
-        console.log('icon: ', icon, isUnit, isEvil, isCurrEvil);
-        return isUnit && isCurrEvil;
-      });
-      console.log('trying to move1 ', enemies);
-
-      const cellId = 13; //pickRandom(enemies, 1);
-      console.log('trying to move', cellId);
+      const enemies = this.cells.filter(({unit, isEvil}) => unit && isEvil);
+      const cellId = pickRandom(enemies, 1).id;
       const availMoves = getAdjacentDiagIds(cellId, size, true, false);
-      console.log('got this', cellId, this.cells[cellId]?.icon, availMoves);
-      const emptySpots = availMoves.filter((currId) => {
-        /*console.log('te', currId, this.cells[currId]?.icon);*/
-        return !!currId && currId >= 0 && currId < 64 && currId !== cellId && !this.cells[currId]?.icon; //&& _.isEmpty(this.cells[item].icon);
-      });
-      console.log('got empty: ', emptySpots);
+      const emptySpots = availMoves.filter(
+        (currId) => !!currId && currId >= 0 && currId < 64 && currId !== cellId && !this.cells[currId]?.icon,
+      );
       if (!_.isEmpty(emptySpots)) {
-        this.moveToCell(pickRandom(emptySpots, 1), this.cells[cellId], true, true);
+        this.moveToCell(pickRandom(emptySpots, 1), this.cells[cellId], true);
         return true;
       } else {
         return false;
       }
     },
-    moveToCell(dest, origin = this.currCell, isEvil) {
+    moveToCell(dest, origin = this.currCell, isEvil = false) {
       console.log('trying to move to ', dest, ' with ', origin);
       /**move to new location*/
-      this.setCellIcon(origin.icon, true, dest, isEvil, true);
+      this.setCell({unitIcon: origin.icon, id: dest, isEvil});
       /**Remove previous*/
-      this.setCellIcon('', true, origin.id, isEvil, false);
+      origin.clearCell();
     },
     /*resetCollectedResource(resource = 0, id = this.currCellId) {
       this.currCell.setResources(resource);

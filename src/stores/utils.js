@@ -4,8 +4,10 @@ import {colors} from '../gStyles';
 import {CHESS_SIZE} from './boardStore';
 
 export const objAdd = (obj, icon, quant = 1) => (obj.hasOwnProperty(icon) ? (obj[icon] += quant) : (obj[icon] = quant));
-export const pickRandom = (list = [], uncertainty = 0.4) =>
-  list[Math.floor((Math.random() * list.length) / uncertainty)];
+export const pickRandom = (list = [], uncertainty = 0.4, withIndex = false) => {
+  const index = Math.floor((Math.random() * list.length) / uncertainty);
+  return withIndex ? {icon: list[index], index} : list[index];
+};
 
 export const numFormat = (num, digits = 1) => {
   const si = [
@@ -40,7 +42,7 @@ export const getAdjacentsIds = (id, size = CHESS_SIZE) => [
 */
 
 /**Base operations*/
-export const withinBoard = (id, extraCond = true, size = CHESS_SIZE) => id >= 0 && id < size * size && id && extraCond;
+export const withinBoard = (id, extraCond = true, size = CHESS_SIZE) => id; // id >= 0 && id < size * size && id && extraCond;
 
 export const up = (id, size = CHESS_SIZE) => withinBoard(id - size);
 export const down = (id, size = CHESS_SIZE) => withinBoard(id + size);
@@ -63,14 +65,14 @@ export const getAdjacentsIds = (id, size = CHESS_SIZE, withSelf = true) => [
   avoidLeft(id) && left(id, size), //left
 ];
 /**Composed ops*/
-export const getAdjacentsIds2 = (id, size = CHESS_SIZE, withSelf = true) => {
-  /*let res = [];
+/*export const getAdjacentsIds2 = (id, size = CHESS_SIZE, withSelf = true) => {
+  /!*let res = [];
   addIfWithin(res, up(id, size));
   addIfWithin(res, down(id, size));
   addIfWithin(res, avoidRight(right(id, size)), right(id, size));
   addIfWithin(res, avoidLeft(left(id, size)), left(id, size));
   addIfWithin(res,avoidRight(id) && left(id, size) )
-  res.push(withinBoard()*/
+  res.push(withinBoard()*!/
   return [
     withSelf && id, // current
     up(id, size), //top
@@ -78,8 +80,8 @@ export const getAdjacentsIds2 = (id, size = CHESS_SIZE, withSelf = true) => {
     avoidRight(id) && right(id, size), //right
     avoidLeft(id) && left(id, size), //left
   ];
-  /* return res;*/
-};
+  /!* return res;*!/
+};*/
 
 export const getAdjacentDiagIds = (id, size = CHESS_SIZE, withDiag = true, withSelf = true) =>
   !withDiag
@@ -93,21 +95,21 @@ export const getAdjacentDiagIds = (id, size = CHESS_SIZE, withDiag = true, withS
       ];
 
 /** Board as a set of cells*/
-export const matchingAdjacentIds = (id, size, board, withDiag) => {
-  return getAdjacentDiagIds(id, size, withDiag).filter((adjId) => board[adjId]?.icon === board[id]?.icon);
-}; // Conjunto grande        =>   Subconjunto
+export const matchingAdjacentIds = (id, size, board, withDiag) =>
+  getAdjacentDiagIds(id, size, withDiag).filter((adjId) => board[adjId]?.icon === board[id]?.icon);
+// Conjunto grande        =>   Subconjunto
 
-export const matchingRecursiveAdjacentIds = (id, size, board, withDiag = false, acum = [id]) =>
+export const matchRecursiveAdjCells = (id, size, board, withDiag = false, acum = [id]) =>
   acum.concat(
     _.difference(matchingAdjacentIds(id, size, board, withDiag), acum).flatMap((adjId) =>
-      matchingRecursiveAdjacentIds(adjId, size, board, withDiag, acum.concat(adjId)),
+      matchRecursiveAdjCells(adjId, size, board, withDiag, acum.concat(adjId)),
     ),
   );
 
-export const efficientMatch = (id, size, board, acum = matchingAdjacentIds(id, size, board)) =>
+/*export const efficientMatch = (id, size, board, acum = matchingAdjacentIds(id, size, board)) =>
   acum.flatMap(
     (adjId) => !acum.includes(adjId) && matchingRecursiveAdjacentIds(adjId, size, board, acum.concat(adjId)),
-  );
+  );*/
 // Conjunto grande        =>   Subconjunto
 
 export const factorial = (x, acum = 1) => (x ? factorial(x - 1, x * acum) : acum);

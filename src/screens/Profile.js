@@ -28,7 +28,7 @@ export default observer(() => {
       <Text style={apply(fonts.title1, C.my2, C.selfCenter)}>{profile.username}</Text>
       {/**Level*/}
       <View style={apply(C.row, C.m1, C.itemsCenter)}>
-        <Box icon={'🧩️'} text={profile.level} value={'/ 10'} border={false} />
+        <Box icon={'⭐️️'} text={profile.level} value={'/ 10'} border={false} />
         <View>
           {isWeb && (
             <ProgressBar
@@ -63,7 +63,7 @@ export default observer(() => {
         )}
         <View style={apply(C.row, C.absolute, C.left_2)}>
           <Box
-            icon={'⭐️'}
+            icon={'🔥'}
             text={profile.scoreForm}
             bg={false}
             value={'/ ' + profile.remainingScoreForm}
@@ -72,7 +72,7 @@ export default observer(() => {
         </View>
         {/*<View style={apply(C.row, C.m1, C.absolute)}>
             {_.range(10).map((item, index) => (
-              <Text style={apply(C.font6, C.flex)}>⭐️</Text>
+              <Text style={apply(C.font6, C.flex)}>🔥</Text>
             ))}
           </View>*/}
         {/*</View>*/}

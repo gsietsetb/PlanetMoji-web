@@ -1,12 +1,13 @@
-import {apply} from 'consistencss';
+import C, {apply} from 'consistencss';
 import React, {useCallback, useEffect, useState} from 'react';
-import {Animated, View} from 'react-native';
-import {bordColor, colors, isWeb} from '../gStyles';
+import {Animated, Easing, Text, TouchableOpacity, View} from 'react-native';
+import {bgColor, bordColor, colors, isWeb} from '../gStyles';
+import {pickRandom} from '../stores/utils';
 
 const ProgressBar = (props) => {
   const {
-    height,
-    progress,
+    height = 12,
+    progress = 40,
     animated,
     indeterminate,
     progressDuration,
@@ -132,3 +133,56 @@ ProgressBar.defaultProps = {
 };
 
 export default ProgressBar;
+
+export const TrackBar = ({progress = 0.4, colBg = colors.paleGreyTwo, colAccent = colors.salmon}) => (
+  <View>
+    <View style={apply(C.radius4, bgColor(colBg), bordColor(colAccent, 1), C.h1, C.w20)} />
+    <View style={apply(C.absolute, bgColor(colAccent), C.radius4, C.h1, C.w10)} />
+  </View>
+);
+
+const options = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣'];
+
+export const SpinIcon = ({icon = '🎲', textStyle}) => {
+  const [anim, setRotateValue] = useState(new Animated.Value(0));
+  const [isSpinning, setSpinning] = useState(false);
+  const [result, setResult] = useState(false);
+
+  const Spinner = Animated.loop(
+    Animated.timing(anim, {
+      toValue: 1,
+      duration: 2000,
+      easing: Easing.linear,
+      useNativeDriver: true,
+    }),
+  );
+  const startSpin = () => {
+    anim.setValue(0);
+    setSpinning(true);
+    Spinner.start(() => startSpin());
+  };
+  const stopSpin = () => {
+    anim.setValue(0);
+    setSpinning(false);
+    setResult(pickRandom(options, 1, true));
+    Spinner.stop();
+  };
+
+  const RotateData = anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
+  return (
+    <TouchableOpacity onPress={() => (isSpinning ? stopSpin() : startSpin())}>
+      {
+        <Animated.Text
+          /*source={icon}*/
+          style={[textStyle, isSpinning && {transform: [{rotate: RotateData}]}]}>
+          {icon}
+        </Animated.Text>
+      }
+      {result && <Text style={textStyle}>{result.icon}</Text>}
+    </TouchableOpacity>
+  );
+};

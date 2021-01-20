@@ -129,7 +129,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.planetmojiweb"
+        applicationId "com.planejtMoji"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

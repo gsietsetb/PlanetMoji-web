@@ -1,15 +1,13 @@
 import {useNavigation} from '@react-navigation/core';
 import C, {apply} from 'consistencss';
-
 import _ from 'lodash';
 import {observer} from 'mobx-react-lite';
 import React, {useRef, useState} from 'react';
 import {Animated, FlatList, SafeAreaView, Text, TouchableOpacity, View} from 'react-native';
 import {profile} from '../App';
-import AddEmojiModal from '../comp/AddEmojiModal';
 import {ResourcesMap, StatsMap, Tag} from '../comp/Box';
 import Cell from '../comp/Cell';
-import ProgressBar from '../comp/ProgressBar';
+import {TrackBar} from '../comp/ProgressBar';
 import {bgColor, bordColor, cell, colors, isTabl, isWeb, shadow, textSize} from '../gStyles';
 import {screens} from '../routes';
 import {CHESS_SIZE} from '../stores/boardStore';
@@ -23,9 +21,7 @@ export const Warriors = ({units = Object.entries(profile.units)}) => (
         ) : (
           _.range(value).map((item) => <Text style={apply(C.font12)}>{key}</Text>)
         )}
-        {!isWeb && (
-          <ProgressBar backgroundColor={colors.grass} progress={Math.random() * 100} noFlex={'80%'} height={12} />
-        )}
+        {!isWeb && <TrackBar colAccent={colors.grass} progress={Math.random() * 100} height={12} />}
         {value >= 3 && <Text style={apply(C.font4)}>x{value}</Text>}
       </TouchableOpacity>
     ))}
@@ -89,6 +85,7 @@ export default observer(() => {
             <Cell
               size={cell.XL}
               iconSize={textSize.L}
+              withFlex
               bg={colors.white}
               wrapStyle={[
                 C.px1,
@@ -125,7 +122,7 @@ export default observer(() => {
         }}
       />
       <Warriors />
-      <AddEmojiModal />
+      {/*<AddEmojiModal />*/}
     </SafeAreaView>
   );
 });

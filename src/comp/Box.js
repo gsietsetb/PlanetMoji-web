@@ -2,7 +2,7 @@ import C, {apply} from 'consistencss';
 import React, {useEffect, useState} from 'react';
 import {Image, Text, TouchableOpacity, View} from 'react-native';
 import {profile} from '../App';
-import {bordColor, cell, colors, fonts, isIOS, setIcon, shadow, textColor, textSize} from '../gStyles';
+import {bordColor, cell, colors, fonts, isIOS, shadow, textColor, textSize} from '../gStyles';
 import {numFormat} from '../stores/utils';
 
 const Box = ({icon, value, text, border = true, horiz = true, bg = true, highlightIcon}) => {
@@ -67,8 +67,8 @@ export const VertInfo = ({text, val, descr, isBig = false, onPress = () => {}}) 
 );
 export const StatsMap = ({profile, showPopulation = false}) => (
   <View style={apply(C.row, C.m4, C.selfCenter)}>
-    <Box icon={setIcon('⭐️')} text={profile.scoreForm} value={'/ ' + profile.remainingScoreForm} />
-    <Box icon={'🧩'} text={profile.level} value={'/10'} />
+    <Box icon={'🔥'} text={profile.scoreForm} value={'/ ' + profile.remainingScoreForm} />
+    <Box icon={'⭐️'} text={profile.level} value={'/10'} />
     {showPopulation && <Box icon={'👨‍👩‍👧‍👦'} text={profile.currPopulation} value={'/' + profile.maxPopulation} />}
   </View>
 );

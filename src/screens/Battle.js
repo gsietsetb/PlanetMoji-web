@@ -1,13 +1,14 @@
 import C, {apply} from 'consistencss';
 import {observer} from 'mobx-react-lite';
 import React, {useEffect, useState} from 'react';
-import {FlatList, SafeAreaView, View} from 'react-native';
+import {FlatList, SafeAreaView, Text, View} from 'react-native';
 import {profile} from '../App';
 /*import FastImage from 'react-native-fast-image';*/
 import AddCard from '../comp/AddCard';
 import {ResourcesMap, StatsMap} from '../comp/Box';
 import Cell from '../comp/Cell';
-import {cell, colors, deviceHeight, imgs, isIOS, isTabl, isWeb} from '../gStyles';
+import {SpinIcon} from '../comp/ProgressBar';
+import {bordColor, cell, colors, fonts, imgs, isIOS, isTabl, isWeb, shadow, textSize} from '../gStyles';
 import {CHESS_SIZE} from '../stores/boardStore';
 import {unitsMap} from '../stores/sets';
 
@@ -44,29 +45,29 @@ const Recruit = () => (
   />
 );
 
-/*const battleModes = {
-  RECRUIT: {title: '🤺 Recruit', Comp: Recruit, id: 0},
-  ATTACK: {title: '⚔️ Attack', Comp: Warriors, id: 1},
-  GRAVEYARD: {title: '🪦 Graveyard', Comp: Warriors, id: 2},
-};*/
-/*
-const battleModes = [
-  {title: '🤺 Recruit', Comp: Recruit, id: 0},
-  {title: '⚔️ Attack 🎲', Comp: Warriors, id: 1},
-  /!*{title: '🪦 Graveyard', Comp: Warriors, id: 2},*!/
-];
-*/
-
 export default observer(() => {
   const currentBoard = profile.boards.battleMap;
-  const [attackMode, setAttackMode] = useState(false);
+  const [myTurn, setMyTurn] = useState(true);
+  const [attack, setAttack] = useState(false);
   /*const nUnits = Object.keys(profile.units).length;*/
 
   useEffect(() => {
     if (!currentBoard.cells[0].icon) {
       profile.addEnemies();
     }
-  }, [currentBoard.cells]);
+  }, []);
+
+  const enemyAttack = () => {
+    setTimeout(() => {
+      let couldMove = false;
+      let i = 100;
+      do {
+        couldMove = currentBoard.randomMove();
+        i--;
+      } while (!couldMove && i > 0);
+      setMyTurn(true);
+    }, 1500);
+  };
 
   return (
     <SafeAreaView style={!isTabl && !isIOS && C.py10} contentContainerStyle={C.itemsCenter}>
@@ -76,7 +77,7 @@ export default observer(() => {
       {/*<Text>
         {currentBoard.currCellId} {attackMode.toString()}
       </Text>*/}
-      <View style={apply(isTabl && C.row, C.itemsCenter, {minHeight: deviceHeight * 0.8})}>
+      <View style={apply(isTabl && C.row, C.itemsCenter, C.justifyBetween)}>
         {/**Chess board*/}
         {currentBoard && (
           <FlatList
@@ -87,102 +88,100 @@ export default observer(() => {
             extraData={currentBoard.currCellId}
             scrollEnabled={false}
             renderItem={({item, index}) => {
-              const optMove =
-                /*attackMode &&
-                currentBoard.isCurrWarrior &&
+              const availMove =
+                myTurn &&
+                currentBoard.isCurrUnit &&
                 !item.icon &&
-                !currentBoard.isCurrEvil &&*/
+                !currentBoard.isCurrEvil &&
+                currentBoard.adjacentDiagIds.includes(index);
+
+              const availAttack =
+                myTurn &&
+                currentBoard.isCurrUnit &&
+                item.isEvil &&
+                /*!item.icon &&*/
+                !currentBoard.isCurrEvil &&
                 currentBoard.adjacentDiagIds.includes(index);
               const isSel = currentBoard.currCellId === index;
-              const highlightColor = optMove ? colors.water : colors.groundSand;
-              return (
-                <>
-                  <Cell
-                    img={isIOS ? imgs.grass : imgs.grassText}
-                    opacity={0.8}
-                    size={isWeb ? cell.XL : cell.Sm}
-                    bg={highlightColor}
-                    index={index}
-                    onPress={() => {
-                      /**Pressing twice allows to move*/
-                      if (index === currentBoard.currCellId) {
-                        setAttackMode(true);
-                      }
-                      if (optMove) {
-                        currentBoard.moveToCell(index, undefined, false);
-                        setAttackMode(!attackMode);
-                        let couldMove = false;
-                        let i = 100;
-                        do {
-                          couldMove = currentBoard.randomMove();
-                          i--;
-                        } while (!couldMove && i > 0);
-                      } else {
-                        currentBoard.setCurrent(index);
-                      }
-                    }}
-                    currCellId={currentBoard.currCellId}
-                    item={item}
-                  />
-                  {/*<TouchableOpacity
-                    onPress={() => {
-                      *Pressing twice allows to move
-                      if (index === currentBoard.currCellId) {
-                        setAttackMode(true);
-                      }
-                      if (optMove) {
-                        currentBoard.moveToCell(index, undefined, false);
-                        setAttackMode(!attackMode);
-                        let couldMove = false;
-                        let i = 100;
-                        do {
-                          couldMove = currentBoard.randomMove();
-                          i--;
-                        } while (!couldMove && i > 0);
-                      } else {
-                        currentBoard.setCurrent(index);
-                      }
-                    }}>
-                    <ImageBackground
-                      source={imgs.grass}
-                      opacity={0.6} //index > 47 ? 0.75 : item.isPressable ? 0.65 : 0.85}
-                      resizeMode={'center'}
-                      style={apply(
-                        cell.L,
-                        C.itemsCenter,
-                        C.justifyCenter,
-                        bgColor(highlightColor),
-                        bordColor(isSel ? colors.blue : colors.grass, optMove ? 1 : 0),
-                        shadow(isEvil ? 'red' colors.salmon : colors.water, item.isUnit ? 0 : 18),
-                        isSel && C.radius2,
-                      )}>
-                       <Text style={[font.Xs, C.absolute, C.left1, C.bottom0]}>{index}</Text>
-                      <Text
-                        style={apply(
-                          textSize.L,
-                          optMove && C.opacity40,
+              const highlightColor = availMove
+                ? colors.grass
+                : item.unit
+                ? item.isEvil
+                  ? colors.salmon /*+ '90'*/
+                  : colors.blue /*+ '90'*/
+                : 'transparent';
 
-                          item.icon && shadow(item.isEvil ? colors.salmon : colors.blue, 6),
-                        )}>
-                        {optMove ? currentBoard.currCell.icon : item.icon} {item.isUnit.toString()}
-                      </Text>
-                    </ImageBackground>
-                  </TouchableOpacity>*/}
-                </>
+              return (
+                <Cell
+                  img={isIOS ? imgs.grass : imgs.grassCut}
+                  opacity={isWeb ? 0.7 : 0.84}
+                  size={isWeb ? cell.Md : cell.Sm}
+                  bg={highlightColor}
+                  index={index}
+                  wrapStyle={[
+                    (availMove || availAttack) && bordColor(availMove ? colors.grass : colors.salmon, isSel ? 3 : 1),
+                    C.flex,
+                    item.unit && C.radius2,
+                  ]}
+                  onPress={() => {
+                    if (availMove) {
+                      currentBoard.moveToCell(index);
+                      setMyTurn(false);
+                      currentBoard.setCurrent(index);
+                      enemyAttack();
+                    } else if (availAttack) {
+                      setAttack({evil: item.unit, own: currentBoard.currCell.unit});
+                    } else {
+                      currentBoard.setCurrent(index);
+                    }
+                  }}
+                  currCellId={currentBoard.currCellId}
+                  item={item}
+                />
               );
             }}
           />
         )}
 
-        <FlatList
-          data={Object.keys(unitsMap)}
-          style={apply(C.p2, C.mb12)}
-          keyExtractor={(item) => item.key}
-          horizontal={!isTabl}
-          numColumns={isTabl ? 2 : 1}
-          extraData={profile.score}
-          renderItem={({item, index}) => <AddCard index={index} item={item} onSet={() => profile.buyUnit(item)} />}
-        />
+        {myTurn ? (
+          attack ? (
+            <View
+              style={[C.row, C.m4, C.itemsCenter, /*bordColor(colors.wood, 2), C.radius2,*/ C.p2, C.justifyBetween]}>
+              <AddCard item={attack.own.icon} own border={colors.salmon} currLife={45} />
+              <View style={[C.itemsCenter, C.contentCenter]}>
+                <View style={[C.row, C.itemsCenter]}>
+                  {/*<Text style={C.mx4}>◀️</Text>*/}
+                  <Text style={[fonts.title1]}> Fight!</Text>
+                  {/*<Text>▶️</Text>*/}
+                </View>
+                <View style={C.row}>
+                  <SpinIcon textStyle={[textSize.L, shadow(colors.salmon, 7), C.p4]} />
+                  <Text style={textSize.L}>🤼‍</Text>
+                  <SpinIcon textStyle={[textSize.L, shadow(colors.blue, 4), C.m4]} />
+                </View>
+              </View>
+              <AddCard item={attack.evil.icon} own currLife={34} />
+            </View>
+          ) : (
+            <>
+              {/*<Tag col={colors.blue} text={'💰 Buy units, then ⚡️ Move & ⚔️ Attack '} />*/}
+              <Text style={[fonts.subtitle, C.textBlue, C.my4]}>💰 Buy units, then ⚡️ Move & ⚔️ Attack </Text>
+              <FlatList
+                data={Object.keys(unitsMap)}
+                style={apply(C.p2, C.mb12)}
+                keyExtractor={(item) => item.key}
+                horizontal={!isTabl}
+                numColumns={isTabl ? 2 : 1}
+                extraData={profile.score}
+                renderItem={({item, index}) => (
+                  <AddCard index={index} item={item} onSet={() => profile.buyUnit(item)} />
+                )}
+              />
+            </>
+          )
+        ) : (
+          <Text style={[fonts.subtitle, C.textSalmon, C.my4]}>⏳ Your oponent is 🤔 thinking...</Text>
+        )}
 
         {/**Switch button*/}
         {/*<View style={apply(isTabl ? C.left_16 : C.top_16, nUnits === 0 && C.opacity30, C.flex)}>

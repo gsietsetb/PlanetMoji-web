@@ -16,6 +16,7 @@ export default ({
   selColor = colors.water,
   showRes = false,
   showFlag = false,
+  withFlex = false,
   wrapStyle,
   onPress,
 }) => {
@@ -25,31 +26,24 @@ export default ({
   const shouldHighlight = !!unit || !!building;
   return (
     <TouchableOpacity activeOpacity={0.7} /*style={[{opacity: opacity}, size]}*/ onPress={onPress} opacity={opacity}>
-      <Image
-        source={img}
-        opacity={opacity}
-        resizeMode={isIOS ? 'center' : 'center'}
-        style={apply(
-          size,
-          C.absolute,
-          bgColor(bg),
-          C.itemsCenter,
-          C.justifyCenter,
-          {opacity: opacity},
-          isCurrent && bordColor(selColor, 2),
-        )}
-      />
-      <View style={apply(size)}>
-        <Text
+      {img && (
+        <Image
+          source={img}
+          opacity={opacity}
+          resizeMode={isIOS ? 'center' : 'cover'}
           style={apply(
-            iconSize,
-            shadow(shouldHighlight && (isEvil ? 'red' : 'blue')),
-            shouldHighlight && C.radius8,
-            shouldHighlight && C.p1,
-            wrapStyle,
-          )}>
-          {icon}
-        </Text>
+            size,
+            C.absolute,
+            /*bgColor(bg),*/
+            C.itemsCenter,
+            C.justifyCenter,
+            {opacity: opacity},
+            isCurrent && bordColor(selColor, 2),
+          )}
+        />
+      )}
+      <View style={apply(C.itemsCenter, size)}>
+        <Text style={apply(iconSize, isCurrent && bordColor(selColor, 2), bgColor(bg + '40'), wrapStyle)}>{icon}</Text>
       </View>
       {/**Badge*/}
       {showRes && item.availResources && (
