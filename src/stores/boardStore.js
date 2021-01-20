@@ -34,21 +34,12 @@ export const boardsMap = {
   WORLD: {
     id: 1,
     startingCell: 27,
-    /*img: () => (Math.random() > 0.2 ? terrains['🌲'] : pickRandom(terrains, 1)),
-    terrain: () => (Math.random() > 0.2 ? terrains['🌲'] : pickRandom(terrains, 1)),*/
-    icon: (cellId, terrain) =>
-      /*terrain === terrains['🌊']
-        ? pickRandom(water, 0.2)
-        :*/ (europeAllow.includes(cellId) || isWeb) &&
-      pickRandom(mountains, 0.2),
-    /*: pickRandom(water, 0.2),*/
-    /*Math.random() > 0.1
-        ?*/
-    /*: pickRandom(nature, 0.25)*/
+    icon: (cellId, terrain) => (europeAllow.includes(cellId) || isWeb) && pickRandom(mountains, isBig ? 0.1 : 0.2),
   },
   VILLAGE: {
     id: 2,
-    icon: (terrain) => pickRandom(trees.concat(flowers, farm, trees /*, Object.keys(buildingsMap)*/), 0.2),
+    icon: (terrain) =>
+      pickRandom(trees.concat(flowers, farm, trees /*, Object.keys(buildingsMap)*/), isBig ? 0.1 : 0.2),
   },
   BATTLE: {
     id: 3,
@@ -228,6 +219,7 @@ export const BoardStore = (boardMap = boardsMap.WORLD, size = CHESS_SIZE, isEmpt
       if (terrain) {
         currCell.setTerrain(terrain);
       }
+      return pos;
     },
     randomMove() {
       const enemies = this.cells.filter(({unit, isEvil}) => unit && isEvil);

@@ -66,6 +66,8 @@ export default observer(() => {
         i--;
       } while (!couldMove && i > 0);
       setMyTurn(true);
+      /**Defaults the move*/
+      currentBoard.setCurrent();
     }, 1500);
   };
 
@@ -114,10 +116,14 @@ export default observer(() => {
               return (
                 <Cell
                   img={isIOS ? imgs.grass : imgs.grassCut}
-                  opacity={isWeb ? 0.7 : 0.84}
+                  opacity={isWeb ? 0.68 : 0.84}
+                  iconOpacity={availMove && 0.4}
+                  availAttack={availAttack && '⚔️'}
                   size={isWeb ? cell.Md : cell.Sm}
+                  iconSize={isWeb ? textSize.L : textSize.L}
                   bg={highlightColor}
                   index={index}
+                  icon={availMove && currentBoard.currCell.icon}
                   wrapStyle={[
                     (availMove || availAttack) && bordColor(availMove ? colors.grass : colors.salmon, isSel ? 3 : 1),
                     C.flex,
@@ -125,14 +131,17 @@ export default observer(() => {
                   ]}
                   onPress={() => {
                     if (availMove) {
+                      /**Move*/
                       currentBoard.moveToCell(index);
                       setMyTurn(false);
                       currentBoard.setCurrent(index);
+                      setAttack(false);
                       enemyAttack();
                     } else if (availAttack) {
                       setAttack({evil: item.unit, own: currentBoard.currCell.unit});
                     } else {
                       currentBoard.setCurrent(index);
+                      setAttack(false);
                     }
                   }}
                   currCellId={currentBoard.currCellId}
@@ -147,25 +156,25 @@ export default observer(() => {
           attack ? (
             <View
               style={[C.row, C.m4, C.itemsCenter, /*bordColor(colors.wood, 2), C.radius2,*/ C.p2, C.justifyBetween]}>
-              <AddCard item={attack.own.icon} own border={colors.salmon} currLife={45} />
+              <AddCard item={attack.own.icon} own border={colors.salmon} currLife={12} />
               <View style={[C.itemsCenter, C.contentCenter]}>
-                <View style={[C.row, C.itemsCenter]}>
+                <View style={[C.row]}>
                   {/*<Text style={C.mx4}>◀️</Text>*/}
                   <Text style={[fonts.title1]}> Fight!</Text>
                   {/*<Text>▶️</Text>*/}
                 </View>
-                <View style={C.row}>
+                <View style={[C.row, C.itemsCenter]}>
                   <SpinIcon textStyle={[textSize.L, shadow(colors.salmon, 7), C.p4]} />
                   <Text style={textSize.L}>🤼‍</Text>
                   <SpinIcon textStyle={[textSize.L, shadow(colors.blue, 4), C.m4]} />
                 </View>
               </View>
-              <AddCard item={attack.evil.icon} own currLife={34} />
+              <AddCard item={attack.evil.icon} own currLife={6} />
             </View>
           ) : (
             <>
-              {/*<Tag col={colors.blue} text={'💰 Buy units, then ⚡️ Move & ⚔️ Attack '} />*/}
-              <Text style={[fonts.subtitle, C.textBlue, C.my4]}>💰 Buy units, then ⚡️ Move & ⚔️ Attack </Text>
+              {/*<Tag col={colors.blue} text={'💰 Buy units, then ⚡️ Move , ⚔️ Attack '} />*/}
+              <Text style={[fonts.subtitle, C.textBlue, C.my4]}>💰 Buy units, then ⚡️ Move, ⚔️ Attack </Text>
               <FlatList
                 data={Object.keys(unitsMap)}
                 style={apply(C.p2, C.mb12)}

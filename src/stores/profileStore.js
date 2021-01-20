@@ -125,15 +125,13 @@ export const ProfileStore = (isIA = false, level = 1) =>
       } else {
         this.addUnit(unitIcon);
         const {cost, score} = unitsMap[unitIcon];
-        /**Deduce resources*/
+        /**Spend resources*/
         Object.entries(cost).map(([res, currCost]) => (this.resources[res] -= currCost));
         /**Update score*/
         this.score += score;
 
         /**Add to board*/
-        board.setCell({unitIcon: unitIcon, overwrite: false});
-
-        /* board.setCellIcon(unit, false, undefined, false, true);*/
+        board.setCurrent(board.setCell({unitIcon: unitIcon, overwrite: false}));
       }
     },
     addUnit(unit, quant = 1) {

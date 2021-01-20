@@ -1,3 +1,4 @@
+import chroma from 'chroma-js';
 import C, {apply, boxShadow} from 'consistencss';
 import {Dimensions, Platform} from 'react-native';
 import {isTablet} from 'react-native-device-info';
@@ -28,6 +29,10 @@ export const colors = {
   black12: 'rgba(0, 0, 0, 0.12)',
   paleGrey: '#f6f7fc',
 };
+
+export const gradFull = chroma.scale(Object.values(colors));
+export const grad = chroma.scale([colors.blueGreen, colors.blue, colors.salmon, 'red']);
+export const gradLife = chroma.scale([colors.salmon, colors.grass]);
 
 export const bgColor = (color = colors.blueGrey) => ({backgroundColor: color});
 export const bordColor = (color = colors.blueGrey, width = 1) => ({

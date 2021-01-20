@@ -134,10 +134,16 @@ ProgressBar.defaultProps = {
 
 export default ProgressBar;
 
-export const TrackBar = ({progress = 0.4, colBg = colors.paleGreyTwo, colAccent = colors.salmon}) => (
-  <View>
-    <View style={apply(C.radius4, bgColor(colBg), bordColor(colAccent, 1), C.h1, C.w20)} />
-    <View style={apply(C.absolute, bgColor(colAccent), C.radius4, C.h1, C.w10)} />
+export const TrackBar = ({
+  progress = 0.4,
+  maxWidth = 11 * 4,
+  wrapStyle,
+  colBg = colors.paleGreyTwo,
+  colAccent = colors.salmon,
+}) => (
+  <View style={[wrapStyle, C.selfCenter]}>
+    <View style={apply(C.radius4, bgColor(colBg), bordColor(colAccent, 1), C.h1, {width: maxWidth})} />
+    <View style={apply(C.absolute, bgColor(colAccent), C.radius4, C.h1, {width: maxWidth * progress})} />
   </View>
 );
 
@@ -151,7 +157,7 @@ export const SpinIcon = ({icon = '🎲', textStyle}) => {
   const Spinner = Animated.loop(
     Animated.timing(anim, {
       toValue: 1,
-      duration: 2000,
+      duration: 500,
       easing: Easing.linear,
       useNativeDriver: true,
     }),
@@ -174,7 +180,7 @@ export const SpinIcon = ({icon = '🎲', textStyle}) => {
   });
 
   return (
-    <TouchableOpacity onPress={() => (isSpinning ? stopSpin() : startSpin())}>
+    <TouchableOpacity onPress={() => !result && (isSpinning ? stopSpin() : startSpin())}>
       {
         <Animated.Text
           /*source={icon}*/
