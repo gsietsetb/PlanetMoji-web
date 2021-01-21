@@ -2,7 +2,6 @@ import C, {apply} from 'consistencss';
 import {observer} from 'mobx-react-lite';
 import React from 'react';
 import {SafeAreaView, Text, TouchableOpacity} from 'react-native';
-import {profile} from '../App';
 /*import {Categories} from 'react-native-emoji-selector';*/
 import {bordColor, colors, fonts} from '../gStyles';
 

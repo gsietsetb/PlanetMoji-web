@@ -70,7 +70,7 @@ export const boardsMap = {
 
 const initStore = (size, boardMap) => _.range(size * size).map((j) => CellStore({id: j, boardMap}));
 
-export const BoardStore = (boardMap = boardsMap.WORLD, size = CHESS_SIZE, isEmpty = true) =>
+export const BoardStore = (boardMap = boardsMap.WORLD, size = boardMap.size || CHESS_SIZE, isEmpty = true) =>
   makeAutoObservable({
     size: boardMap.size, // 8x8
     cells: initStore(size, boardMap),
@@ -111,20 +111,22 @@ export const BoardStore = (boardMap = boardsMap.WORLD, size = CHESS_SIZE, isEmpt
       console.log('rea all good', pos);
 
       const currCell = this.cells[pos];
-      console.log('setting', icon, id, currCell, unitIcon, pos, id, overwrite); // this.findNextEmpty(id));
-      if (icon) {
-        currCell.setIcon(icon);
+      if (currCell) {
+        console.log('setting', icon, id, currCell, unitIcon, pos, id, overwrite); // this.findNextEmpty(id));
+        if (icon) {
+          currCell.setIcon(icon);
+        }
+        if (unitIcon) {
+          currCell.setUnit(UnitStore(unitIcon, pos, isEvil));
+        }
+        if (buildIcon) {
+          currCell.setBuilding(BuildingStore(buildIcon, pos, isEvil, flag));
+        }
+        if (terrain) {
+          currCell.setTerrain(terrain);
+        }
+        return pos;
       }
-      if (unitIcon) {
-        currCell.setUnit(UnitStore(unitIcon, pos, isEvil));
-      }
-      if (buildIcon) {
-        currCell.setBuilding(BuildingStore(buildIcon, pos, isEvil, flag));
-      }
-      if (terrain) {
-        currCell.setTerrain(terrain);
-      }
-      return pos;
     },
     /**Harvest specific*/
     harvestCombo: {length: 1, icon: '🔥'},

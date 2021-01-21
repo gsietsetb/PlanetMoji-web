@@ -21,5 +21,6 @@ extend({colors: {...colors}});
 
 export const profile = ProfileStore();
 
+/*profile.initBoards();*/
 const App: () => React$Node = observer(() => <Navigator />);
 export default App;

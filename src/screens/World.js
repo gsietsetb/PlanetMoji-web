@@ -4,7 +4,7 @@ import {useNavigation} from '@react-navigation/core';
 import {useNavigation} from '@react-navigation/core';
 import C, {apply} from 'consistencss';
 import {observer} from 'mobx-react-lite';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {FlatList, ImageBackground, SafeAreaView, Text, TouchableOpacity, View} from 'react-native';
 import {profile} from '../App';
 import AddCard from '../comp/AddCard';
@@ -32,12 +32,12 @@ export default observer(() => {
   const currentBoard = profile.boards.worldMap;
   const useNav = !isWeb && useNavigation();
 
-  useEffect(() => {
-    /*currentBoard.shuffle(true);*/
+  /*useEffect(() => {
+    /!*currentBoard.shuffle(true);*!/
     currentBoard.setCell({buildIcon: '🛖', isEvil: true, id: 105, flag: '🇮🇪'});
-    /**Set Water*/
-    /*getAdjacentsIds(76).map((item) => currentBoard.setCell({overwrite: false, terrain: terrains['🌊'], icon: '🌊'}));*/
-  }, [currentBoard]);
+    /!**Set Water*!/
+    /!*getAdjacentsIds(76).map((item) => currentBoard.setCell({overwrite: false, terrain: terrains['🌊'], icon: '🌊'}));*!/
+  }, [currentBoard]);*/
   return (
     <SafeAreaView style={apply(C.flex, C.bgWater)}>
       {currentBoard && (
@@ -54,7 +54,7 @@ export default observer(() => {
             keyExtractor={(item) => item.id}
             renderItem={({item, index}) => (
               <Cell /*img={isWeb ? imgs.grassText : imgs.grass}*/ /*bg={item.bg}*/ ///*index % 5 === 0 ?*/ item.icon ? colors.groundSand : colors.sand} //item.boardMap.terrain.bg}
-                opacity={isWeb ? 0.55 : isIOS ? 0.7 : 0.6} //!isWeb && europeAllow.includes(index) ? 0.75 : 0.6}
+                opacity={isWeb ? 0.55 : isIOS ? 0.75 : 0.6} //!isWeb && europeAllow.includes(index) ? 0.75 : 0.6}
                 bg={!isWeb && (isIOS ? colors.water : colors.groundSand)}
                 img={isIOS ? imgs.grass : imgs.grassCut}
                 index={index}

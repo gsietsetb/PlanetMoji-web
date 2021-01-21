@@ -33,13 +33,16 @@ const Box = ({icon, value, text, border = true, horiz = true, bg = true, highlig
   );
 };
 export const planets = ['🌎', '🌏', '🌍'];
-export const Spinner = ({speed = 500}) => {
+export const Spinner = ({speed = 500, size = textSize.XL}) => {
   const [num, setNum] = useState(0);
-  useEffect(() => setTimeout(() => setNum(num === 2 ? 0 : num + 1), speed), [num, speed]);
+  useEffect(() => {
+    const spinTimeout = setTimeout(() => setNum(num === 2 ? 0 : num + 1), speed);
+    return () => clearTimeout(spinTimeout);
+  }, [num, speed]);
   return (
-    <View style={apply(C.flex, C.itemsCenter, C.m3)}>
-      <Text style={textSize.XL}>{planets[num]}</Text>
-    </View>
+    /*<View style={apply(C.flex, C.itemsCenter, C.m3)}>*/
+    <Text style={size}>{planets[num]}</Text>
+    /*</View>*/
   );
 };
 

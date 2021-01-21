@@ -11,9 +11,11 @@ import Collect from './screens/Collect';
 import Harvest from './screens/Harvest';
 import Profile from './screens/Profile';
 import Recruit from './screens/Recruit';
+import Splash from './screens/Splash';
 import Village from './screens/Village';
 import Welcome from './screens/Welcome';
 import World from './screens/World';
+import {ProfileStore} from './stores/profileStore';
 
 const Tab = createBottomTabNavigator();
 export const SCREEN_TABS = 'TABS';
@@ -88,31 +90,41 @@ const Tabs = ({currTabs = tabs}) => (
   </Tab.Navigator>
 );
 
-export const Navigator = () => (
+/**This is the starting point*/
+export const profileStore = ProfileStore();
+
+export const Navigator = () => {
+  if (!profileStore.initComplete) {
+    // We haven't finished checking for the token yet
+    return <Splash />;
+  }
+};
+
+return (
   <NavigationContainer>
-    {!profile.isSignedIn ? (
-      <Stack.Screen
-        name="SignIn"
-        component={Welcome}
-        options={{
-          title: 'Sign in',
-          // When logging out, a pop animation feels intuitive
-          // You can remove this if you want the default 'push' animation
-          animationTypeForReplace: profile.isSignedIn ? 'pop' : 'push',
-        }}
-      />
-    ) : (
-      <Stack.Navigator
-        screenOptions={({route, navigation}) => ({
-          headerShown: false,
-          gestureEnabled: true,
-          cardOverlayEnabled: true,
-        })}>
-        {!isWeb && <Stack.Screen name={SCREEN_TABS} component={Tabs} />}
-        {Object.values(screens).map(({name, icon, badge, Comp}, index) => (
-          <Stack.Screen name={name} component={Comp} />
-        ))}
-      </Stack.Navigator>
-    )}
+    <Stack.Navigator
+      screenOptions={({route, navigation}) => ({
+        headerShown: false,
+        gestureEnabled: true,
+        cardOverlayEnabled: true,
+      })}>
+      {profile.isSignedIn ? (
+        <Stack.Screen
+          name="SignIn"
+          component={Welcome}
+          options={{
+            title: 'Sign in',
+            animationTypeForReplace: profile.isSignedIn ? 'pop' : 'push',
+          }}
+        />
+      ) : (
+        <>
+          {!isWeb && <Stack.Screen name={SCREEN_TABS} component={Tabs} />}
+          {Object.values(screens).map(({name, icon, badge, Comp}, index) => (
+            <Stack.Screen name={name} component={Comp} />
+          ))}
+        </>
+      )}
+    </Stack.Navigator>
   </NavigationContainer>
 );

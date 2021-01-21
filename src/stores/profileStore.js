@@ -4,7 +4,7 @@ import {Alert} from 'react-native';
 import {profile} from '../App';
 /*import SnackBar from 'rn-snackbar';*/
 import {screens} from '../routes';
-import {boardsMap, BoardStore, modalStore, VILLAGE_SIZE, WORLD_SIZE} from './boardStore';
+import {boardsMap, BoardStore, modalStore} from './boardStore';
 import {buildingsMap, levels, unitsMap} from './sets';
 import {numFormat, objAdd, pickRandom} from './utils';
 
@@ -27,10 +27,13 @@ export const ProfileStore = (isIA = false, level = 1) =>
     get cleanMatching() {
       return Object.keys(this.matchEurope);
     },
+    get initComplete() {
+      return !_.isEmpty(this.boards);
+    },
     get isSignedIn() {
       return _.isEmpty(this.uid);
     },
-    currentScreen: 'World', //Only for web
+    currentScreen: 'Planet', //Only for web
     setCurrentScreen(screenName) {
       this.currentScreen = screenName;
     },
@@ -41,12 +44,42 @@ export const ProfileStore = (isIA = false, level = 1) =>
     get emoji() {
       return levels[this.level - 1];
     },
-    setMoji(emoji) {
+    /*setMoji(emoji) {
       this.emoji = emoji;
-    },
+    },*/
     flag: '🇪🇸',
     setFlag(emoji) {
       this.flag = emoji;
+    },
+    async initializeFromAsyncStorage() {
+      const result = await AsyncStorage.getItem('fooObject');
+      if (result !== null) {
+        this.fooObject = JSON.parse(result);
+      }
+    },
+    /**Boards*/
+    boards: {
+      /*worldMap: BoardStore(boardsMap.WORLD),
+      villageMap: BoardStore(boardsMap.VILLAGE),
+      recruitMap: BoardStore(boardsMap.RECRUIT),
+      harvestMap: BoardStore(boardsMap.HARVEST),
+      fruitsMap: BoardStore(boardsMap.FRUITS),
+      toolsMap: BoardStore(boardsMap.TOOLS),
+      battleMap: BoardStore(boardsMap.BATTLE),*/
+    },
+    initBoards() {
+      this.boards.worldMap = BoardStore(boardsMap.WORLD);
+      this.boards.villageMap = BoardStore(boardsMap.VILLAGE);
+      this.boards.recruitMap = BoardStore(boardsMap.RECRUIT);
+      this.boards.harvestMap = BoardStore(boardsMap.HARVEST);
+      this.boards.fruitsMap = BoardStore(boardsMap.FRUITS);
+      this.boards.toolsMap = BoardStore(boardsMap.TOOLS);
+      this.boards.battleMap = BoardStore(boardsMap.BATTLE);
+      console.log('init steps');
+      /*harvestMap: BoardStore(boardsMap.HARVEST),
+        fruitsMap: BoardStore(boardsMap.FRUITS),
+        toolsMap: BoardStore(boardsMap.TOOLS),
+        battleMap: BoardStore(boardsMap.BATTLE)*/
     },
 
     /**Stats*/
@@ -72,17 +105,6 @@ export const ProfileStore = (isIA = false, level = 1) =>
                                                                                                                                                                                                                                                             ),*/
     flagModal: modalStore(),
     eMojiModal: modalStore(),
-
-    /**Boards*/
-    boards: {
-      worldMap: BoardStore(boardsMap.WORLD, WORLD_SIZE),
-      villageMap: BoardStore(boardsMap.VILLAGE, VILLAGE_SIZE),
-      recruitMap: BoardStore(boardsMap.RECRUIT),
-      harvestMap: BoardStore(boardsMap.HARVEST),
-      fruitsMap: BoardStore(boardsMap.FRUITS),
-      toolsMap: BoardStore(boardsMap.TOOLS),
-      battleMap: BoardStore(boardsMap.BATTLE),
-    },
 
     /**Population*/
     currPopulation: 0,
