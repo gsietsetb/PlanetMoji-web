@@ -58,7 +58,12 @@ export const boardsMap = {
     icon: () => pickRandom(harvest, 1),
     collectList: harvest,
   },
-  RECRUIT: {id: 5, icon: () => pickRandom(Object.keys(unitsMap), 1), collectList: Object.keys(unitsMap)},
+  RECRUIT: {
+    id: 5,
+    icon: () => pickRandom(Object.keys(unitsMap), 1),
+    withDiag: true,
+    collectList: Object.keys(unitsMap),
+  },
   FRUITS: {id: 6, icon: () => pickRandom(fruits, 1), collectList: fruits, withDiag: true},
   TOOLS: {id: 7, icon: () => pickRandom(tools, 1), collectList: tools, withDiag: true},
 };
@@ -76,117 +81,6 @@ export const BoardStore = (boardMap = boardsMap.WORLD, size = CHESS_SIZE, isEmpt
       this.cells = initStore(size, boardMap);
     },
     currCellId: boardMap.startingCell || size * size - 1,
-
-    /**Harvest specific*/
-    harvestCombo: {length: 1, icon: '🔥'},
-    promotedDiag: '🔥', //boardMap.collectList ? pickRandom(boardMap.collectList, 1) : '🔥',
-    setComboRecord(length, icon) {
-      this.harvestCombo = {length, icon};
-    },
-
-    remShuffles: boardMap.shuffle || 1,
-    remBombs: boardMap.bombs || 1,
-    remMoves: boardMap.initMoves || 3,
-    addMoves(mov = -1) {
-      this.remMoves += mov;
-    },
-
-    /** 💣 ExplodeAll 💥 */
-    shouldExplodeAll: false,
-    get explodeCandidates() {
-      return this.cells.filter(({icon}) => icon === '🔥').map(({id}) => id);
-    },
-    explodeAll(matchIcon = '🔥') {
-      this.shouldExplodeAll = true;
-      this.reassignCells({cells: this.explodeCandidates, currIcon: matchIcon});
-      this.remBombs--;
-      this.shouldExplodeAll = false;
-    },
-
-    shouldHighlight(cellIndex) {
-      return this.shouldExplodeAll
-        ? this.cells[cellIndex] === this.promotedDiag
-        : this.matchRecursiveAdjIds.includes(cellIndex);
-    },
-
-    recruit(matchIcon) {
-      const comboSize = this.matchRecursiveAdjIds.length;
-      profile.addUnit(matchIcon, comboSize - 2);
-      this.reassignCells({newIcons: Object.keys(unitsMap).filter((key) => key === matchIcon), currIcon: matchIcon});
-      this.remMoves--;
-    },
-    collectCells(matchIcon = '🔥', isResource) {
-      console.log('re', matchIcon, isResource);
-      const comboSize = this.matchRecursiveAdjIds.length;
-      console.log('cobmo', comboSize, this.matchRecursiveAdjIds);
-
-      /**Updates harvestCombo*/
-      if (comboSize > 6) {
-        this.addMoves(comboSize - 6);
-        if (comboSize >= this.harvestCombo.length) {
-          this.setComboRecord(comboSize, matchIcon);
-        }
-      }
-      console.log('this was also fine! :ok: ', comboSize);
-      profile.harvestResource(matchIcon, comboSize, isResource);
-      this.reassignCells({currIcon: matchIcon, newIcons: isResource ? harvest : fruits});
-      isResource && this.remMoves--;
-    },
-
-    get currCell() {
-      return this.cells[this.currCellId];
-    },
-    get adjacentIds() {
-      return getAdjacentsIds(this.currCellId, size);
-    },
-    get adjacentDiagIds() {
-      return getAdjacentDiagIds(this.currCellId, size);
-    },
-    setCurrent(cellId = 0) {
-      this.currCellId = cellId > 0 ? cellId : 0;
-    },
-
-    get matchRecursiveAdjIds() {
-      return unique(
-        matchRecursiveAdjCells(this.currCellId, size, this.cells, boardsMap.withDiag || this.currCell.icon === '💎'),
-      );
-    },
-    get validMatch() {
-      return this.matchRecursiveAdjIds.length > 2;
-    },
-    get isCurrUnit() {
-      return !!this.currCell.unit;
-    },
-    get isCurrEvil() {
-      return this.currCell.isEvil;
-    },
-    get randomEnemy() {
-      return pickRandom(
-        this.cells.filter(({isUnit, isEvil}) => isUnit && isEvil),
-        1,
-      );
-    },
-    reassignCells({cells = this.matchRecursiveAdjIds, newIcons = harvest, currIcon = '🔥'}) {
-      console.log('ogingt to cargarme: ', cells, newIcons, currIcon);
-      cells.map((cur) => {
-        console.log(
-          'oim ina loop:: ',
-          cur,
-          pickRandom(
-            newIcons.filter((icon) => icon !== currIcon),
-            1,
-          ),
-        );
-        this.setCell({
-          icon: pickRandom(
-            newIcons.filter((icon) => icon !== currIcon),
-            1,
-          ),
-          overwrite: true,
-          id: cur,
-        });
-      });
-    },
     findNextEmpty(id) {
       let pos = id;
       while (!!this.cells[pos].icon && pos >= 0) {
@@ -207,9 +101,17 @@ export const BoardStore = (boardMap = boardsMap.WORLD, size = CHESS_SIZE, isEmpt
       isEvil = false,
       flag = isEvil ? '🇪🇸' : profile.flag,
     }) {
-      const pos = overwrite ? id : this.findNextEmpty(id);
+      console.log('before all good', icon, id, overwrite);
+      let pos = id;
+      if (!overwrite) {
+        console.log('erhjo THIS NEVER BEEN EXECUTED; RIGHT?');
+        pos = this.findNextEmpty(id);
+      }
+      // overwrite ? id : this.findNextEmpty(id);
+      console.log('rea all good', pos);
+
       const currCell = this.cells[pos];
-      console.log('setting', icon, id, currCell, unitIcon, pos, id, overwrite, this.findNextEmpty(id));
+      console.log('setting', icon, id, currCell, unitIcon, pos, id, overwrite); // this.findNextEmpty(id));
       if (icon) {
         currCell.setIcon(icon);
       }
@@ -223,6 +125,120 @@ export const BoardStore = (boardMap = boardsMap.WORLD, size = CHESS_SIZE, isEmpt
         currCell.setTerrain(terrain);
       }
       return pos;
+    },
+    /**Harvest specific*/
+    harvestCombo: {length: 1, icon: '🔥'},
+    bombIcon: '🔥', //boardMap.collectList ? pickRandom(boardMap.collectList, 1) : '🔥',
+    setComboRecord(length, icon) {
+      this.harvestCombo = {length, icon};
+    },
+
+    remShuffles: boardMap.shuffle || 1,
+    remBombs: boardMap.bombs || 1,
+    remMoves: boardMap.initMoves || 3,
+    addMoves(mov = -1) {
+      this.remMoves += mov;
+    },
+
+    /** 💣 ExplodeAll 💥 */
+    shouldExplodeAll: false,
+    get explodeCandidates() {
+      return this.cells.filter(({icon}) => icon === '🧟').map(({id}) => id);
+    },
+    explodeMatching(matchIcon = '🧟') {
+      this.shouldExplodeAll = true;
+      this.reassignCells({cells: this.cells.filter(({icon}) => icon === '🧟').map(({id}) => id), currIcon: matchIcon});
+      this.remBombs--;
+      this.shouldExplodeAll = false;
+    },
+
+    shouldHighlight(cellIndex) {
+      return this.shouldExplodeAll
+        ? this.cells[cellIndex] === this.bombIcon
+        : this.matchRecursiveAdjIds.includes(cellIndex);
+    },
+
+    recruit(matchIcon) {
+      const comboSize = this.matchRecursiveAdjIds.length;
+      profile.addUnit(matchIcon, comboSize - 2);
+      this.reassignCells({newIcons: Object.keys(unitsMap), currIcon: matchIcon});
+      this.remMoves--;
+    },
+    collectCells(matchIcon = '🔥', isResource) {
+      console.log('re', matchIcon, isResource);
+      const comboSize = this.matchRecursiveAdjIds.length;
+      console.log('cobmo', comboSize, this.matchRecursiveAdjIds);
+
+      /**Updates harvestCombo*/
+      if (comboSize > 6) {
+        this.addMoves(comboSize - 6);
+        if (comboSize >= this.harvestCombo.length) {
+          this.setComboRecord(comboSize, matchIcon);
+        }
+      }
+      console.log('this was also fine! :ok: ', comboSize);
+
+      profile.harvestResource(matchIcon, comboSize, isResource);
+      if (isResource) {
+        this.remMoves--;
+      }
+      this.reassignCells({currIcon: matchIcon, newIcons: isResource ? harvest : fruits});
+    },
+
+    get currCell() {
+      return this.cells[this.currCellId];
+    },
+    get adjacentIds() {
+      return getAdjacentsIds(this.currCellId, size);
+    },
+    get adjacentDiagIds() {
+      return getAdjacentDiagIds(this.currCellId, size);
+    },
+    setCurrent(cellId = 0) {
+      this.currCellId = cellId > 0 ? cellId : 0;
+    },
+
+    get matchRecursiveAdjIds() {
+      return unique(
+        matchRecursiveAdjCells(this.currCellId, size, this.cells, boardMap.withDiag || this.currCell.icon === '🔥'),
+      );
+    },
+    get validMatch() {
+      return this.matchRecursiveAdjIds.length > 2;
+    },
+    get isCurrUnit() {
+      return !!this.currCell.unit;
+    },
+    get isCurrEvil() {
+      return this.currCell.isEvil;
+    },
+    get randomEnemy() {
+      return pickRandom(
+        this.cells.filter(({isUnit, isEvil}) => isUnit && isEvil),
+        1,
+      );
+    },
+    reassignCells({cells = this.matchRecursiveAdjIds, newIcons = harvest, currIcon = '🔥'}) {
+      console.log('ogingt to cargarme: ', cells, newIcons, currIcon);
+      const filterSet = newIcons.filter((icon) => icon !== currIcon);
+
+      cells.forEach((currCellId) => this.cells[currCellId].setIcon(pickRandom(filterSet, 1))); //this.setCell({icon: '💎', id: currCellId}));
+      /*for (let cellsKey in cells) {
+        console.log('oim ina loop:: ', cellsKey, filterSet, pickRandom(filterSet, 1));
+        this.setCell({
+          icon: '⚡️', //pickRandom(filterSet, 1),
+          overwrite: true,
+          id: 25,
+        });
+      }*/
+      /*cells.map((cur) => {
+        console.log('oim ina loop:: ', cur, filterSet, pickRandom(filterSet, 1));
+        this.setCell({
+          icon: '⚡️', //pickRandom(filterSet, 1),
+          overwrite: true,
+          id: 25,
+        });
+      });*/
     },
     randomMove() {
       const enemies = this.cells.filter(({unit, isEvil}) => unit && isEvil);

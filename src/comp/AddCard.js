@@ -7,11 +7,19 @@ import {unitsMap} from '../stores/sets';
 import {Column} from './Box';
 import {TrackBar} from './ProgressBar';
 
-export default ({item, list = unitsMap, border = colors.blue, own = false, currLife, onSet = profile.buyUnit}) => {
+export default ({
+  item,
+  list = unitsMap,
+  isBuilding = false,
+  border = colors.blue,
+  own = false,
+  currLife,
+  onSet = profile.buyUnit,
+}) => {
   const {level, cost, score, skills} = list[item];
   const tooExpensive = Object.entries(cost).some(([res, currCost], index) => currCost > profile.resources[res] || 0);
   const isReady = profile.level >= level;
-  const forbidden = !isReady || tooExpensive || profile.populationExceeded;
+  const forbidden = !isReady || tooExpensive || (!isBuilding && profile.populationExceeded);
   return (
     <View
       style={apply(C.m1, own ? C.p2 : C.p1, C.bgWhite, C.radius2, bordColor(forbidden ? colors.blueGrey : border, 2))}>

@@ -50,10 +50,10 @@ export const Tag = ({text, col = colors.sand, onPress}) => (
     {text}
   </Text>
 );
-export const Column = ({text, val, col = colors.black, isBig = false, onPress}) => (
+export const Column = ({text, val, toShadow = false, col = colors.black, isBig = false, onPress = () => {}, opac}) => (
   <TouchableOpacity
-    onPress={onPress}
-    style={apply(!onPress && C.opacity60, isBig ? C.mx4 : C.mxHairline, C.itemsCenter)}>
+    onPress={opac ? onPress : () => {}}
+    style={apply(opac && C.opacity60, isBig ? C.mx4 : C.mxHairline, C.itemsCenter, toShadow && shadow(col, 4))}>
     <Text style={apply(isBig ? textSize.Md : textSize.Xs)}>{text}</Text>
     <Text style={apply(isBig ? fonts.body1 : fonts.caption, textColor(col))}>{val}</Text>
   </TouchableOpacity>

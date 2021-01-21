@@ -1,6 +1,6 @@
-import {colors, imgs, isWeb, setIcon} from '../gStyles';
+import {colors, imgs, isWeb} from '../gStyles';
 
-export const resources = ['💎', setIcon('🪵'), '🥩', setIcon('🪨')];
+export const resources = ['💎', '🪵', '🥩', '🪨'];
 export const harvest = ['🔥', ...resources];
 export const trees = ['🌴', '🌳', '🌵', '🌲'];
 export const nature = ['🌊', '🌪'];

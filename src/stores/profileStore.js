@@ -3,7 +3,6 @@ import {makeAutoObservable} from 'mobx';
 import {Alert} from 'react-native';
 import {profile} from '../App';
 /*import SnackBar from 'rn-snackbar';*/
-import {setIcon} from '../gStyles';
 import {screens} from '../routes';
 import {boardsMap, BoardStore, modalStore, VILLAGE_SIZE, WORLD_SIZE} from './boardStore';
 import {buildingsMap, levels, unitsMap} from './sets';
@@ -31,7 +30,7 @@ export const ProfileStore = (isIA = false, level = 1) =>
     get isSignedIn() {
       return _.isEmpty(this.uid);
     },
-    currentScreen: 'Collect', //Only for web
+    currentScreen: 'World', //Only for web
     setCurrentScreen(screenName) {
       this.currentScreen = screenName;
     },
@@ -94,21 +93,28 @@ export const ProfileStore = (isIA = false, level = 1) =>
     get level() {
       return Math.floor(Math.log10(this.score)) + 1;
     },
-    harvestResource(resource, quant = 2, isResource) {
-      //if(this.collected[resource]) (this.collected[resource] += quant) else quant;
-      isResource && this.collect(resource, quant);
+    harvestResource(resource, comboSize = 2, isResource) {
+      /*const combo = Math.pow(2, comboSize);*/
+      if (resource === '🔥') {
+        this.score += comboSize * 2;
+      } else {
+        this.score += comboSize;
+        if (isResource) {
+          this.resources[resource] += comboSize;
+        }
+      }
     },
     buyBuilding(buildIcon = buildingsMap['⛺️'], board = this.boards.worldMap) {
       console.log('_createPadding, ', buildIcon);
       objAdd(this.buildingsList, buildIcon);
-      const {cost, score, population} = buildingsMap[buildIcon];
+      const {cost, score, skills} = buildingsMap[buildIcon];
 
       /**Deduce resources*/
       Object.entries(cost).map(([res, amount]) => amount > 0 && (this.resources[res] -= amount));
       /**Update score & population*/
       this.score += score;
-      if (population && population > 0) {
-        this.maxPopulation += population;
+      if (skills['👨‍👩‍👧‍👦'] > 0) {
+        this.maxPopulation += skills['👨‍👩‍👧‍👦'];
       }
 
       /**Add to board*/
@@ -153,24 +159,6 @@ export const ProfileStore = (isIA = false, level = 1) =>
           isEvil: true,
         });
       }
-    },
-    collect(resource, val) {
-      const combo = Math.pow(2, val);
-      if (resource === setIcon('🔥')) {
-        this.score += combo;
-      } else if (resource === '🔥') {
-        this.score += combo * 2;
-      } else {
-        this.score += val;
-        this.resources[resource] += combo;
-      }
-      /*val > 7 &&
-        SnackBar.show('💥 Combo of ' + val + ' ' + resource + '! => ' + combo, {
-          style: apply(C.radius2, C.mb16, C.mx4),
-          backgroundColor: colors.black,
-          buttonColor: colors.paleGrey,
-          textColor: colors.paleGrey,
-        });*/
     },
   });
 

@@ -127,6 +127,7 @@ export const CollapsableCards = ({onPress, icon = '🧙‍'}) => {
           renderItem={({item, index}) => (
             <AddCard
               list={buildingsMap}
+              isBuilding
               index={index}
               item={item}
               onSet={() => {

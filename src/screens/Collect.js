@@ -5,7 +5,7 @@ import {observer} from 'mobx-react-lite';
 import React, {useState} from 'react';
 import {FlatList, SafeAreaView, Text, View} from 'react-native';
 import {profile} from '../App';
-import {CloseButton, Column, ResourcesMap, StatsMap, Tag} from '../comp/Box';
+import {CloseButton, ResourcesMap, StatsMap, Tag} from '../comp/Box';
 import Cell from '../comp/Cell';
 import {bgColor, bordColor, cell, colors, deviceWidth, fonts, isBig, isIOS, isWeb, shadow, textSize} from '../gStyles';
 import {CHESS_SIZE} from '../stores/boardStore';
@@ -17,9 +17,9 @@ export default observer(
     ExtraComp,
     showCombo = true,
     withBonus = false,
-    isResource = true,
+    isResource = false,
   }) => {
-    const {promotedDiag, harvestCombo, cells, remMoves, remShuffles, remBombs} = currentBoard;
+    const {bombIcon, harvestCombo, cells, remMoves, remShuffles, remBombs} = currentBoard;
     const [showMatching, setShowMatching] = useState(false);
     const {goBack} = !isWeb && useNavigation();
 
@@ -46,11 +46,11 @@ export default observer(
     };
 
     return (
-      <SafeAreaView style={apply(isIOS && C.py8, C.hFull, C.itemsCenter, bgColor(colors.white))}>
+      <SafeAreaView style={apply(isIOS && C.py4, C.hFull, C.itemsCenter, bgColor(colors.white))}>
         {!isWeb && <CloseButton navigate={goBack} />}
         {/**Resources*/}
         <StatsMap profile={profile} />
-        <ResourcesMap resources={profile.resources} withBord={false} highlightIcon={promotedDiag} />
+        <ResourcesMap resources={profile.resources} withBord={false} highlightIcon={bombIcon} />
 
         {cells && (
           <FlatList
@@ -83,18 +83,18 @@ export default observer(
           />
         )}
 
-        {withBonus ? (
-          <View style={apply(C.row, C.mb8)}>
-            {/**Moves*/}
+        {/*{!withBonus && (
+          <View style={apply(C.row, C.mb2)}>
+            *Moves
             <Column isBig text={'⚡️'} val={'Moves (' + remMoves + ')'} />
-            {/**Shuffle*/}
+            *Shuffle
             <Column
               isBig
               text={'🔄'}
               val={'Shuffle (' + remShuffles + ')'}
               onPress={remShuffles > 0 && (() => currentBoard.shuffle())}
             />
-            {/**Bombs*/}
+            *Bombs
             <Column
               isBig
               onPress={remBombs > 0 && (() => blinkBg(() => currentBoard.explodeAll()))}
@@ -102,29 +102,31 @@ export default observer(
               val={'Explode (' + remBombs + ')'}
             />
           </View>
-        ) : (
+        )}*/}
+        {/*/*: (
           <CollectList units={Object.entries(profile.collected)} />
-        )}
-        {/**Highest combo strike*/}
-        {showCombo && harvestCombo.length > 2 && (
-          <View style={apply(C.itemsCenter, C.row, C.mb3)}>
-            <Tag text={'🔝 combo: (' + harvestCombo.length + ')'} />
-            {/*<Text style={apply(fonts.subtitle)}> ⚡️Highest combo: ({harvestCombo.length})</Text>*/}
-            <Text numberOfLines={2} style={apply(textSize.Md, {maxWidth: deviceWidth * 0.6})}>
-              {_.range(harvestCombo.length).map((item) => harvestCombo.icon)}
-            </Text>
-          </View>
-        )}
+        )}*/}
+        <Tag text={'⚡️ Moves:' + remMoves} />
 
-        {/**Hint*/}
-        {hint && (
-          <View style={apply(C.row, C.itemsCenter, C.mb4)}>
-            <Tag text={'💡Hint'} />
-            <Text style={apply(fonts.body1)}>
-              {promotedDiag} {hint}{' '}
-            </Text>
-          </View>
-        )}
+        {/**Highest combo strike*/}
+        {showCombo
+          ? harvestCombo.length > 2 && (
+              <View style={apply(C.itemsCenter, C.row, C.mb3)}>
+                <Tag text={'🔝 combo: (' + harvestCombo.length + ')'} col={colors.fire} />
+                {/*<Text style={apply(fonts.subtitle)}> ⚡️Highest combo: ({harvestCombo.length})</Text>*/}
+                <Text numberOfLines={2} style={apply(textSize.Md, {maxWidth: deviceWidth * 0.6})}>
+                  {_.range(harvestCombo.length).map((item) => harvestCombo.icon)}
+                </Text>
+              </View>
+            )
+          : hint && (
+              <View style={apply(C.row, C.itemsCenter, C.mb4)}>
+                <Tag text={'💡Hint'} />
+                <Text style={apply(fonts.body1)}>
+                  {bombIcon} {hint}{' '}
+                </Text>
+              </View>
+            )}
       </SafeAreaView>
     );
   },

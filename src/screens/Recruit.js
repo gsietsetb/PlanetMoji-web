@@ -5,7 +5,7 @@ import {observer} from 'mobx-react-lite';
 import React, {useRef, useState} from 'react';
 import {Animated, FlatList, SafeAreaView, Text, TouchableOpacity, View} from 'react-native';
 import {profile} from '../App';
-import {ResourcesMap, StatsMap, Tag} from '../comp/Box';
+import {Column, ResourcesMap, StatsMap, Tag} from '../comp/Box';
 import Cell from '../comp/Cell';
 import {TrackBar} from '../comp/ProgressBar';
 import {bgColor, bordColor, cell, colors, isBig, isIOS, isTabl, isWeb, shadow, textSize} from '../gStyles';
@@ -68,6 +68,7 @@ export default observer(() => {
                     ).current;*/
 
   const gameOver = currentBoard.remMoves < 1 || profile.currPopulation >= profile.maxPopulation;
+  const {remShuffles, remBombs} = currentBoard;
 
   return (
     <SafeAreaView style={apply(C.py8, C.itemsCenter, bgColor(colors.white), C.flex)}>
@@ -79,7 +80,7 @@ export default observer(() => {
         <FlatList
           data={currentBoard.cells}
           numColumns={CHESS_SIZE}
-          style={apply(C.my6, profile.populationExceeded && C.opacity25)}
+          style={apply(C.my6, gameOver && C.opacity25)}
           extraData={currentBoard.cells}
           scrollEnabled={false}
           renderItem={({item, index}) => (
@@ -92,8 +93,16 @@ export default observer(() => {
                 isWeb ? C.m1 : C.px1,
                 {margin: 2},
                 C.radius3,
-                !isIOS && showMatching && currentBoard.shouldHighlight(index) && bgColor(colors.water + '20'),
-                shadow(colors.blue, showMatching && currentBoard.shouldHighlight(index) ? 14 : 3),
+                !isIOS && showMatching && currentBoard.shouldHighlight(index) && bgColor(colors.water + '40'),
+                shadow(
+                  currentBoard.cells
+                    .filter(({icon}) => icon === '🧟')
+                    .map(({id}) => id)
+                    .includes(index)
+                    ? 'red'
+                    : colors.blue,
+                  showMatching && currentBoard.shouldHighlight(index) ? 14 : 5,
+                ),
               ]}
               index={index}
               onPress={() => !gameOver && clearCellGroup(index, item.icon)}
@@ -116,16 +125,44 @@ export default observer(() => {
         />
       )}
 
-      {!_.isEmpty(profile.units) && (
-        <Tag
-          text={'️ ➕ Add to map'}
-          onPress={() => {
-            profile.addUnitsBoard();
-            navigate(screens.Battle);
-          }}
+      <View style={apply(C.row, C.mb2)}>
+        {/**Moves*/}
+        {/*<Column isBig text={'⚡️'} val={'Moves (' + remMoves + ')'} />*/}
+        {/**Shuffle*/}
+        <Column
+          isBig
+          text={'🔄'}
+          val={'Shuffle (' + remShuffles + ')'}
+          opac={remShuffles <= 0}
+          onPress={() => remShuffles > 0 && currentBoard.shuffle()}
         />
+        {/**Bombs*/}
+        <Column
+          isBig
+          opac={remBombs <= 0}
+          onPress={() => remBombs > 0 && blinkBg(() => currentBoard.explodeMatching())}
+          text={'💉🧟'}
+          col={'red'}
+          toShadow
+          val={'Heal Zombies (' + remBombs + ')'}
+        />
+      </View>
+      {/*<Text>{JSON.stringify(currentBoard.explodeCandidates)}</Text>
+      <Text>{JSON.stringify(currentBoard.cells.filter(({icon}) => icon === '🧟').map(({id}) => id))}</Text>*/}
+
+      {!_.isEmpty(profile.units) && (
+        <View style={[C.absolute, C.right2, C.bottom12]}>
+          <Tag
+            text={'️ ➕ Add to map'}
+            onPress={() => {
+              profile.addUnitsBoard();
+              navigate(screens.Battle);
+            }}
+          />
+        </View>
       )}
       <Warriors />
+
       {/*<AddEmojiModal />*/}
     </SafeAreaView>
   );
