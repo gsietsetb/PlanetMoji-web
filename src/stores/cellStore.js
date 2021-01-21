@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import {makeAutoObservable} from 'mobx';
 import {nanoid} from 'nanoid/non-secure';
 import {profile} from '../App';
@@ -88,7 +89,10 @@ export const CellStore = ({
       return chessColor(this.id); //this.isPressable ? /!*colors.white *!/ grassGenerator(this.id) : colors.water;
     },*/
     get isUnit() {
-      return !!this.unit;
+      return !_.isEmpty(this.unit);
+    },
+    get ourBuilding() {
+      return !!this.building && this.isEvil;
     },
 
     /**Timer*/
@@ -122,7 +126,7 @@ export const CellStore = ({
       this.icon = '';
       this.isEvil = false;
     },
-    setBuilding(newBuild = true, isNewEvil = newBuild.isEvil, newFlag = profile.flag) {
+    setBuilding(newBuild = true, isNewEvil = newBuild.isEvil, newFlag = newBuild.flag) {
       this.building = newBuild;
       this.icon = newBuild.icon;
       this.isEvil = isNewEvil;

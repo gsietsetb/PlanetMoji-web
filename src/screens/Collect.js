@@ -5,9 +5,9 @@ import {observer} from 'mobx-react-lite';
 import React, {useState} from 'react';
 import {FlatList, SafeAreaView, Text, View} from 'react-native';
 import {profile} from '../App';
-import {CloseButton, ResourcesMap, StatsMap, Tag, VertInfo} from '../comp/Box';
+import {CloseButton, Column, ResourcesMap, StatsMap, Tag} from '../comp/Box';
 import Cell from '../comp/Cell';
-import {bgColor, bordColor, cell, colors, deviceWidth, fonts, isIOS, isWeb, shadow, textSize} from '../gStyles';
+import {bgColor, bordColor, cell, colors, deviceWidth, fonts, isBig, isIOS, isWeb, shadow, textSize} from '../gStyles';
 import {CHESS_SIZE} from '../stores/boardStore';
 
 export default observer(
@@ -46,7 +46,7 @@ export default observer(
     };
 
     return (
-      <SafeAreaView style={apply(isIOS && C.py8, C.itemsCenter, bgColor(colors.white))}>
+      <SafeAreaView style={apply(isIOS && C.py8, C.hFull, C.itemsCenter, bgColor(colors.white))}>
         {!isWeb && <CloseButton navigate={goBack} />}
         {/**Resources*/}
         <StatsMap profile={profile} />
@@ -56,23 +56,24 @@ export default observer(
           <FlatList
             data={cells}
             numColumns={CHESS_SIZE}
-            style={apply(remMoves < 1 && C.opacity25)}
+            style={apply(C.my6, remMoves < 1 && C.opacity25)}
+            contentContainerStyle={[isBig && C.p2]}
             extraData={cells}
             scrollEnabled={false}
             renderItem={({item, index}) => (
               <Cell
-                size={cell.XL}
-                iconSize={textSize.L}
+                size={cell.L}
+                iconSize={isBig ? textSize.XL : textSize.L}
                 bg={colors.white}
-                withFlex
+                withFlex={!isWeb}
                 withTransp={false}
-                currCellId={currentBoard.currCellId}
                 wrapStyle={[
-                  C.px1,
-                  bordColor(colors.water, 0.5),
-                  C.radius2,
-                  isIOS &&
-                    shadow(colors.blue, showMatching && currentBoard.shouldHighlight(index) ? (isIOS ? 14 : 0) : 3),
+                  bordColor(colors.water, isIOS ? 0.5 : 1),
+                  isWeb ? C.m1 : C.px1,
+                  {margin: 2},
+                  C.radius3,
+                  !isIOS && showMatching && currentBoard.shouldHighlight(index) && bgColor(colors.water + '20'),
+                  shadow(colors.blue, showMatching && currentBoard.shouldHighlight(index) ? 14 : 3),
                 ]}
                 index={index}
                 onPress={() => remMoves > 0 && tryCollect(index, item.icon)}
@@ -83,24 +84,22 @@ export default observer(
         )}
 
         {withBonus ? (
-          <View style={apply(C.row, C.mb4)}>
+          <View style={apply(C.row, C.mb8)}>
             {/**Moves*/}
-            <VertInfo isBig descr={'Moves'} text={'💥'} val={'(' + remMoves + ')'} />
+            <Column isBig text={'⚡️'} val={'Moves (' + remMoves + ')'} />
             {/**Shuffle*/}
-            <VertInfo
+            <Column
               isBig
-              onPress={() => currentBoard.shuffle()}
               text={'🔄'}
-              descr={'Shuffle'}
-              val={'(' + remShuffles + ')'}
+              val={'Shuffle (' + remShuffles + ')'}
+              onPress={remShuffles > 0 && (() => currentBoard.shuffle())}
             />
             {/**Bombs*/}
-            <VertInfo
+            <Column
               isBig
-              onPress={() => remBombs > 0 && blinkBg(() => currentBoard.explodeAll())}
-              descr={'Explode'}
+              onPress={remBombs > 0 && (() => blinkBg(() => currentBoard.explodeAll()))}
               text={'💣'}
-              val={'(' + remBombs + ')'}
+              val={'Explode (' + remBombs + ')'}
             />
           </View>
         ) : (

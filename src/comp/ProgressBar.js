@@ -1,7 +1,7 @@
 import C, {apply} from 'consistencss';
 import React, {useCallback, useEffect, useState} from 'react';
 import {Animated, Easing, Text, TouchableOpacity, View} from 'react-native';
-import {bgColor, bordColor, colors, isWeb} from '../gStyles';
+import {BASE_PIXEL, bgColor, bordColor, colors, gradGold, isWeb, shadow} from '../gStyles';
 import {pickRandom} from '../stores/utils';
 
 const ProgressBar = (props) => {
@@ -136,14 +136,21 @@ export default ProgressBar;
 
 export const TrackBar = ({
   progress = 0.4,
-  maxWidth = 11 * 4,
+  maxWidth = 11 * BASE_PIXEL,
+  height = BASE_PIXEL,
   wrapStyle,
+  grad = gradGold,
   colBg = colors.paleGreyTwo,
-  colAccent = colors.salmon,
+  colAccent = grad(progress).toString(),
 }) => (
   <View style={[wrapStyle, C.selfCenter]}>
-    <View style={apply(C.radius4, bgColor(colBg), bordColor(colAccent, 1), C.h1, {width: maxWidth})} />
-    <View style={apply(C.absolute, bgColor(colAccent), C.radius4, C.h1, {width: maxWidth * progress})} />
+    <View style={apply(C.radius4, bgColor(colBg), bordColor(colAccent, 1), {width: maxWidth, height: height + 1})} />
+    <View
+      style={apply(C.absolute, bgColor(colAccent), shadow(colAccent), C.radius4, {
+        width: maxWidth * (progress > 1 ? progress / 100 : progress),
+        height: height,
+      })}
+    />
   </View>
 );
 

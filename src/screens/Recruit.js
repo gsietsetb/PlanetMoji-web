@@ -8,7 +8,7 @@ import {profile} from '../App';
 import {ResourcesMap, StatsMap, Tag} from '../comp/Box';
 import Cell from '../comp/Cell';
 import {TrackBar} from '../comp/ProgressBar';
-import {bgColor, bordColor, cell, colors, isTabl, isWeb, shadow, textSize} from '../gStyles';
+import {bgColor, bordColor, cell, colors, isBig, isIOS, isTabl, isWeb, shadow, textSize} from '../gStyles';
 import {screens} from '../routes';
 import {CHESS_SIZE} from '../stores/boardStore';
 
@@ -21,7 +21,7 @@ export const Warriors = ({units = Object.entries(profile.units)}) => (
         ) : (
           _.range(value).map((item) => <Text style={apply(C.font12)}>{key}</Text>)
         )}
-        {!isWeb && <TrackBar colAccent={colors.grass} progress={Math.random() * 100} height={12} />}
+        <TrackBar colAccent={colors.grass} progress={Math.random()} />
         {value >= 3 && <Text style={apply(C.font4)}>x{value}</Text>}
       </TouchableOpacity>
     ))}
@@ -79,18 +79,20 @@ export default observer(() => {
         <FlatList
           data={currentBoard.cells}
           numColumns={CHESS_SIZE}
+          style={apply(C.my6, profile.populationExceeded && C.opacity25)}
           extraData={currentBoard.cells}
           scrollEnabled={false}
           renderItem={({item, index}) => (
             <Cell
-              size={cell.XL}
-              iconSize={textSize.L}
-              withFlex
+              size={cell.L}
+              iconSize={isBig ? textSize.XL : textSize.L}
               bg={colors.white}
               wrapStyle={[
-                C.px1,
-                bordColor(colors.water, 0.5),
-                C.radius2,
+                bordColor(colors.water, isIOS ? 0.5 : 1),
+                isWeb ? C.m1 : C.px1,
+                {margin: 2},
+                C.radius3,
+                !isIOS && showMatching && currentBoard.shouldHighlight(index) && bgColor(colors.water + '20'),
                 shadow(colors.blue, showMatching && currentBoard.shouldHighlight(index) ? 14 : 3),
               ]}
               index={index}
@@ -114,13 +116,15 @@ export default observer(() => {
         />
       )}
 
-      <Tag
-        text={'️Add to map⤴'}
-        onPress={() => {
-          profile.addUnitsBoard();
-          navigate(screens.Battle);
-        }}
-      />
+      {!_.isEmpty(profile.units) && (
+        <Tag
+          text={'️ ➕ Add to map'}
+          onPress={() => {
+            profile.addUnitsBoard();
+            navigate(screens.Battle);
+          }}
+        />
+      )}
       <Warriors />
       {/*<AddEmojiModal />*/}
     </SafeAreaView>

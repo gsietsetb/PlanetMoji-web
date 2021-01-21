@@ -18,7 +18,7 @@ import World from './screens/World';
 const Tab = createBottomTabNavigator();
 export const SCREEN_TABS = 'TABS';
 export const screens = {
-  Planet: {icon: '🌏', Comp: World, name: 'Planet'},
+  Planet: {icon: '🌍', Comp: World, name: 'Planet'},
   Village: {icon: '🏘', Comp: Village, name: 'Village'},
   Collect: {icon: '🧺', Comp: Harvest, name: 'Collect'},
   Fruit: {icon: '🧺', Comp: () => <Collect currentBoard={profile.boards.fruitsMap} />, name: 'Fruit'},
@@ -27,7 +27,7 @@ export const screens = {
   Battle: {icon: '⚔️', Comp: Battle, name: 'Battle'},
   Train: {icon: '🏋️‍', Comp: Battle, name: 'Train'},
   Fight: {icon: '🤼‍', Comp: Battle, name: 'Fight'},
-  Profile: {icon: '👶' /* profile?.emoji*/, badge: 1, Comp: Profile, name: 'Profile'},
+  Profile: {icon: '🧝‍', Comp: Profile, name: 'Profile'},
 };
 
 export const tabs = [
@@ -41,7 +41,7 @@ export const tabs = [
 const Stack = createStackNavigator();
 
 export const WebNavigation = ({currScreen, onSet}) => (
-  <View style={apply(C.row, C.justifyBetween, C.px4, C.radius2, C.itemsCenter, shadow())}>
+  <View style={apply(C.row, C.justifyBetween, C.px4, C.radius2, C.itemsCenter, C.shadowMd)}>
     {tabs.map(({icon, Comp, name}, index) => (
       <TouchableOpacity
         onPress={() => onSet(name)}
@@ -58,7 +58,7 @@ export const WebNavigation = ({currScreen, onSet}) => (
 export const nav = (screen, useNav) => {
   console.log('teho', screen, useNav);
   if (isWeb) {
-    profile.setCurrentScreen(screen);
+    /*profile.setCurrentScreen(screen);*/
     profile.modal.showModal();
   } else {
     useNav.navigate(screen);

@@ -2,7 +2,7 @@ import C, {apply} from 'consistencss';
 import React, {useEffect, useState} from 'react';
 import {Image, Text, TouchableOpacity, View} from 'react-native';
 import {profile} from '../App';
-import {bordColor, cell, colors, fonts, isIOS, shadow, textColor, textSize} from '../gStyles';
+import {bordColor, cell, colors, fonts, isIOS, isWeb, shadow, textColor, textSize} from '../gStyles';
 import {numFormat} from '../stores/utils';
 
 const Box = ({icon, value, text, border = true, horiz = true, bg = true, highlightIcon}) => {
@@ -50,16 +50,38 @@ export const Tag = ({text, col = colors.sand, onPress}) => (
     {text}
   </Text>
 );
-export const Column = ({text, val, col = colors.black, isBig = false, onPress = () => {}}) => (
-  <TouchableOpacity onPress={onPress} style={apply(C.mxHairline, C.itemsCenter)}>
+export const Column = ({text, val, col = colors.black, isBig = false, onPress}) => (
+  <TouchableOpacity
+    onPress={onPress}
+    style={apply(!onPress && C.opacity60, isBig ? C.mx4 : C.mxHairline, C.itemsCenter)}>
     <Text style={apply(isBig ? textSize.Md : textSize.Xs)}>{text}</Text>
-    <Text style={apply(fonts.caption, textColor(col))}>{val}</Text>
+    <Text style={apply(isBig ? fonts.body1 : fonts.caption, textColor(col))}>{val}</Text>
+  </TouchableOpacity>
+);
+
+export const Badge = ({text, left, bottom, top, right, isBig = false, onPress = () => {}}) => (
+  <TouchableOpacity
+    onPress={onPress}
+    style={apply(
+      C.radius4,
+      C.shadowLg,
+      isBig ? cell.Xs : [C.w5, C.h5],
+      C.absolute,
+      C.itemsCenter,
+      top && (isBig ? C.top_3 : C.top0),
+      left && (isBig ? C.left_3 : C.left0),
+      right && (isBig ? C.right_3 : C.right0),
+      bottom && (isBig ? C.bottom_3 : C.bottom0),
+      C.bgWhite,
+      shadow(colors.water, 3),
+    )}>
+    <Text style={[textSize.Sm, !isWeb && C.top1, shadow(colors.water, 3)]}>{text}</Text>
   </TouchableOpacity>
 );
 
 export const VertInfo = ({text, val, descr, isBig = false, onPress = () => {}}) => (
   <TouchableOpacity onPress={onPress} style={apply(C.mx1, C.itemsCenter)}>
-    <Text style={apply(isBig ? textSize.L : textSize.Sm, C.my2)}>{text}</Text>
+    <Text style={apply(isBig ? textSize.L : textSize.Sm, C.my2, shadow(colors.water))}>{text}</Text>
     {descr && <Tag col={colors.water} text={descr + ' ' + val} />}
     {/*<Tag text={text} />*/}
     {/*<Text style={apply(isBig ? textSize.Md : textSize.Xs)}>{val}</Text>*/}
@@ -85,7 +107,7 @@ export const CloseButton = ({navigate, onPress}) => (
       shadow(colors.salmon, 2),
     )}
     onPress={onPress || (() => navigate())}>
-    ️️❌
+    ️️⤬
   </Text>
 );
 

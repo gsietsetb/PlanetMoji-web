@@ -2,17 +2,17 @@ import _ from 'lodash';
 import {makeAutoObservable} from 'mobx';
 import {nanoid} from 'nanoid/non-secure';
 import {profile} from '../App';
-import {deviceHeight, deviceWidth, isBig, isWeb} from '../gStyles';
+import {BASE_PIXEL, deviceHeight, deviceWidth, isBig, isWeb} from '../gStyles';
 import {BuildingStore, CellStore, UnitStore} from './cellStore';
 import {europeAllow, farm, flowers, fruits, harvest, mountains, tools, trees, unitsMap} from './sets';
 import {chessColor, getAdjacentDiagIds, getAdjacentsIds, matchRecursiveAdjCells, pickRandom, unique} from './utils';
 
-export const xCells = (cellSize = 13) => Math.ceil(deviceWidth / (cellSize * 4));
-export const yCells = (cellSize = 13) => Math.ceil((deviceHeight * 0.9) / (cellSize * 4));
+export const xCells = (cellSize = 13) => Math.ceil(deviceWidth / (cellSize * BASE_PIXEL));
+export const yCells = (cellSize = 13) => Math.ceil((deviceHeight * 0.9) / (cellSize * BASE_PIXEL));
 
 const VILLAGE_CELL_SIZE = isBig ? 24 : 16;
 export const WORLD_SIZE = isWeb ? /*xCells * xCells*/ 20 * 20 : 13; // xCells * yCells; //
-export const VILLAGE_SIZE = /*isWeb ?*/ xCells(VILLAGE_CELL_SIZE) * yCells(VILLAGE_CELL_SIZE);
+export const VILLAGE_SIZE = /*isWeb ?*/ xCells(VILLAGE_CELL_SIZE) * yCells(VILLAGE_CELL_SIZE) * 1.2;
 export const CHESS_SIZE = 8;
 
 export const modalStore = (show = false) =>
@@ -32,11 +32,13 @@ export const modalStore = (show = false) =>
   });
 export const boardsMap = {
   WORLD: {
+    size: WORLD_SIZE,
     id: 1,
     startingCell: 27,
     icon: (cellId, terrain) => (europeAllow.includes(cellId) || isWeb) && pickRandom(mountains, isBig ? 0.1 : 0.2),
   },
   VILLAGE: {
+    size: VILLAGE_SIZE,
     id: 2,
     icon: (terrain) =>
       pickRandom(trees.concat(flowers, farm, trees /*, Object.keys(buildingsMap)*/), isBig ? 0.1 : 0.2),
@@ -65,7 +67,7 @@ const initStore = (size, boardMap) => _.range(size * size).map((j) => CellStore(
 
 export const BoardStore = (boardMap = boardsMap.WORLD, size = CHESS_SIZE, isEmpty = true) =>
   makeAutoObservable({
-    size: size, // 8x8
+    size: boardMap.size, // 8x8
     cells: initStore(size, boardMap),
     shuffle(isStart = false) {
       if (!isStart && this.remShuffles > 0) {
@@ -203,6 +205,7 @@ export const BoardStore = (boardMap = boardsMap.WORLD, size = CHESS_SIZE, isEmpt
       unitIcon,
       buildIcon,
       isEvil = false,
+      flag = isEvil ? '🇪🇸' : profile.flag,
     }) {
       const pos = overwrite ? id : this.findNextEmpty(id);
       const currCell = this.cells[pos];
@@ -214,7 +217,7 @@ export const BoardStore = (boardMap = boardsMap.WORLD, size = CHESS_SIZE, isEmpt
         currCell.setUnit(UnitStore(unitIcon, pos, isEvil));
       }
       if (buildIcon) {
-        currCell.setBuilding(BuildingStore(buildIcon, pos, isEvil));
+        currCell.setBuilding(BuildingStore(buildIcon, pos, isEvil, flag));
       }
       if (terrain) {
         currCell.setTerrain(terrain);

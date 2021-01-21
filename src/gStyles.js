@@ -6,12 +6,16 @@ import {isTablet} from 'react-native-device-info';
 export const deviceHeight = Dimensions.get('window').height;
 export const deviceWidth = Dimensions.get('window').width;
 
+export const BASE_PIXEL = 4;
+
 export const colors = {
   blue: '#355eb9',
   black: '#020202',
   black40: 'rgba(0, 0, 0, 0.4)',
   wood: '#804000',
   salmon: '#c14e2b',
+  flame: '#c14e2b',
+  fire: '#db8d2d',
   salmon40: '#c14e2b20',
   blueGrey: '#9399ac',
   grass: '#baf2b5',
@@ -30,9 +34,10 @@ export const colors = {
   paleGrey: '#f6f7fc',
 };
 
+export const gradGold = chroma.scale([colors.sand, colors.groundSand, colors.sand30]);
 export const gradFull = chroma.scale(Object.values(colors));
 export const grad = chroma.scale([colors.blueGreen, colors.blue, colors.salmon, 'red']);
-export const gradLife = chroma.scale([colors.salmon, colors.grass]);
+export const gradLife = chroma.scale([colors.fire, colors.salmon, colors.grass, colors.green]);
 
 export const bgColor = (color = colors.blueGrey) => ({backgroundColor: color});
 export const bordColor = (color = colors.blueGrey, width = 1) => ({
@@ -59,15 +64,16 @@ export const h100 = (num = 70) => ({maxHeight: deviceHeight * num});
 export const minH100 = (num = 70) => ({minHeight: deviceHeight * num});
 
 export const iconSizeBig = isBig ? C.font16 : C.font12;
+export const defFont = {fontFamily: 'Papyrus'};
 export const textSize = {
-  Xs: isBig ? C.font4 : C.font3,
-  Sm: isBig ? C.font6 : C.font4,
-  Md: isBig ? C.font9 : C.font8,
-  L: isBig ? C.font14 : C.font10,
-  XL: isBig ? C.font16 : C.font13,
+  Xs: [isBig ? C.font4 : C.font3, defFont],
+  Sm: [isBig ? C.font6 : C.font4, defFont],
+  Md: [isBig ? C.font9 : C.font8, defFont],
+  L: [isBig ? C.font14 : C.font10, defFont],
+  XL: [isBig ? C.font26 : C.font13, defFont],
 };
 export const cell = {
-  Xs: apply(isBig ? [C.w6, C.w6, C.flex, C.minh6] : [C.w4, C.h4]), // 6 & 4
+  Xs: apply(isBig ? [C.w6, C.w6, C.flex, C.minh6] : [C.w7, C.h7]), // 6 & 4
   Sm: apply(isBig ? [C.w17, C.w17, C.flex, C.minh17] : [C.w12, C.h12]), // 17 & 12
   Md: apply(isBig ? [C.w20, C.w20, C.flex, C.minh20] : [C.w13, C.h13]), // 20 & 13
   L: apply(isBig ? [C.w22, C.w22, C.flex, C.minh22] : [C.w13, C.h13]), // 22 & 14
@@ -95,6 +101,12 @@ export const topBorder = {
 export const imgs = {
   europe: require('./assets/europe.png'),
   europeWest: require('./assets/europeSp.png'),
+
+  uri: {america: 'https://fvmstatic.s3.amazonaws.com/maps/m/WRLD-SA-01-0002.png'},
+  cat: {
+    uri:
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Mapa_provincial_de_Catalunya.svg/816px-Mapa_provincial_de_Catalunya.svg.png',
+  },
   europeWeb: {
     uri: 'https://www.pngkey.com/png/full/205-2054388_792px-blank-map-europe-no-borders-europe-map.png',
   },
@@ -141,34 +153,40 @@ export const badgeWrapper = apply(
 /**Fonts*/
 export const fonts = {
   input: {
-    fontFamily: 'Avenir-Roman',
+    fontFamily: 'Papyrus',
     fontSize: isBig ? 20 : 16,
     fontWeight: 'normal',
     fontStyle: 'normal',
-    lineHeight: 24,
     letterSpacing: 0,
     color: colors.blueGrey,
   },
   title1: {
-    fontFamily: 'Avenir',
+    fontFamily: 'Papyrus',
     fontSize: isBig ? 28 : 24,
     fontWeight: '900',
     fontStyle: 'normal',
-    lineHeight: 40,
-    letterSpacing: 0,
+    letterSpacing: 3,
+    color: colors.black,
+  },
+  title2: {
+    fontFamily: 'Papyrus',
+    fontSize: isBig ? 20 : 16,
+    fontWeight: 'bold',
+    fontStyle: 'normal',
+    letterSpacing: 3,
     color: colors.black,
   },
   subtitle: {
-    fontFamily: 'Avenir',
+    fontFamily: 'Avenir Next', //'Papyrus', //'Avenir Next',
     fontSize: isBig ? 20 : 16,
-    fontWeight: '900',
+    fontWeight: '600',
     fontStyle: 'normal',
-    letterSpacing: 0,
+    letterSpacing: 1,
     textAlign: 'center',
     color: colors.black,
   },
   caption: {
-    fontFamily: 'Avenir',
+    fontFamily: 'Papyrus',
     fontSize: isBig ? 13 : 11,
     fontWeight: '500',
     fontStyle: 'normal',
@@ -176,7 +194,7 @@ export const fonts = {
     color: colors.black,
   },
   body1: {
-    fontFamily: 'Avenir',
+    fontFamily: 'Papyrus',
     fontSize: isBig ? 20 : 16,
     fontWeight: '500',
     fontStyle: 'normal',

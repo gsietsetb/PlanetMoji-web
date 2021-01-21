@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import {makeAutoObservable} from 'mobx';
 import {Alert} from 'react-native';
+import {profile} from '../App';
 /*import SnackBar from 'rn-snackbar';*/
 import {setIcon} from '../gStyles';
 import {screens} from '../routes';
@@ -30,7 +31,7 @@ export const ProfileStore = (isIA = false, level = 1) =>
     get isSignedIn() {
       return _.isEmpty(this.uid);
     },
-    currentScreen: 'Planet', //Only for web
+    currentScreen: 'Collect', //Only for web
     setCurrentScreen(screenName) {
       this.currentScreen = screenName;
     },
@@ -44,7 +45,7 @@ export const ProfileStore = (isIA = false, level = 1) =>
     setMoji(emoji) {
       this.emoji = emoji;
     },
-    flag: '🇺🇸',
+    flag: '🇪🇸',
     setFlag(emoji) {
       this.flag = emoji;
     },
@@ -112,7 +113,7 @@ export const ProfileStore = (isIA = false, level = 1) =>
 
       /**Add to board*/
       //board.setCellIcon(buildIcon, false, undefined, true);
-      board.setCell({buildIcon, overwrite: false});
+      board.setCell({buildIcon, overwrite: false, flag: profile.flag});
     },
 
     /**Units*/

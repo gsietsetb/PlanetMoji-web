@@ -4,7 +4,7 @@ import {observer} from 'mobx-react-lite';
 import React from 'react';
 import {SafeAreaView, ScrollView} from 'react-native';
 import AddEmojiModal from './comp/AddEmojiModal';
-import {bgColor, colors, deviceHeight} from './gStyles';
+import {bgColor, colors} from './gStyles';
 import {screens, WebNavigation} from './routes';
 import {CollectFruit} from './screens/Harvest';
 import {ProfileStore} from './stores/profileStore';
@@ -43,7 +43,7 @@ const App: () => React$Node = observer(() => {
     <SafeAreaView style={apply(bgColor(colors.paleGrey))}>
       <WebNavigation currScreen={profile.currentScreen} onSet={(index) => profile.setCurrentScreen(index)} />
       {/*<Spinner speed={200} />*/}
-      <ScrollView style={apply(C.m2, C.flex, {minHeight: deviceHeight})}>
+      <ScrollView style={apply(C.flex, C.hFull)}>
         <Comp />
       </ScrollView>
       <AddEmojiModal Comp={<CollectFruit />} />

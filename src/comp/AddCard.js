@@ -2,7 +2,7 @@ import C, {apply} from 'consistencss';
 import React from 'react';
 import {Text, TouchableOpacity, View} from 'react-native';
 import {profile} from '../App';
-import {bordColor, colors, gradLife, isWeb, textSize} from '../gStyles';
+import {BASE_PIXEL, bordColor, colors, gradLife, isWeb, textSize} from '../gStyles';
 import {unitsMap} from '../stores/sets';
 import {Column} from './Box';
 import {TrackBar} from './ProgressBar';
@@ -27,7 +27,7 @@ export default ({item, list = unitsMap, border = colors.blue, own = false, currL
         </View>
         {currLife && !isWeb && (
           <TrackBar
-            maxWidth={20 * 4}
+            maxWidth={20 * BASE_PIXEL}
             colAccent={gradLife(currLife / skills['❤️']).toString()}
             progress={currLife / skills['❤️']}
           />
@@ -36,7 +36,7 @@ export default ({item, list = unitsMap, border = colors.blue, own = false, currL
         <View style={C.row}>
           {Object.entries(skills).map(
             ([skill, amount]) =>
-              amount > 0 && skill !== '❤️' && <Column text={skill} /*col={colors.green}*/ val={amount} />,
+              amount > 0 && skill !== '❤️' && <Column text={skill} /*col={colors.green}*/ val={amount > 1 && amount} />,
           )}
         </View>
 

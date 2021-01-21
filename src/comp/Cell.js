@@ -2,7 +2,7 @@ import C, {apply} from 'consistencss';
 import _ from 'lodash';
 import React from 'react';
 import {Image, Text, TouchableOpacity, View} from 'react-native';
-import {badgeWrapper, bgColor, bordColor, cell, colors, shadow, textSize} from '../gStyles';
+import {badgeWrapper, bgColor, bordColor, cell, colors, gradLife, shadow, textSize} from '../gStyles';
 import {TrackBar} from './ProgressBar';
 
 export default ({
@@ -28,7 +28,11 @@ export default ({
   const {isEvil, unit, building} = item;
   const shouldHighlight = !!unit || !!building;
   return (
-    <TouchableOpacity activeOpacity={0.7} style={[bgColor(bg + '90'), size]} onPress={onPress} opacity={opacity}>
+    <TouchableOpacity
+      activeOpacity={0.7}
+      style={[bgColor(bg + '90'), size, !img && wrapStyle]}
+      onPress={onPress}
+      opacity={opacity}>
       {img && (
         <Image
           source={img}
@@ -47,17 +51,19 @@ export default ({
       )}
       <View
         style={apply(
+          size,
           iconOpacity && {opacity: iconOpacity},
           C.itemsCenter,
-          size,
-          isCurrent && bordColor(selColor, 2),
-          /*bgColor(bg),*/
-          wrapStyle,
-          /* bgColor(bg + '40'),*/
+          C.justifyCenter,
+          C.contentCenter,
+          img && isCurrent && bordColor(selColor, 2),
+          img && wrapStyle,
         )}>
-        <Text style={apply(iconSize)}>{_.isEmpty(item.icon) ? icon : item.icon}</Text>
+        <Text style={apply(iconSize, C.maxh12, C.selfCenter)}>{_.isEmpty(item.icon) ? icon : item.icon}</Text>
       </View>
-      {isCurrent && unit && <TrackBar wrapStyle={[C.absolute, C.bottom0, C.shadowMd]} />}
+      {isCurrent && unit && (
+        <TrackBar grad={gradLife} progress={Math.random()} wrapStyle={[C.absolute, C.bottom0, C.shadowMd]} />
+      )}
       {/**Badge*/}
       {showRes && item.availResources && (
         <View style={badgeWrapper}>

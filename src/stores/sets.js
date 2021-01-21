@@ -12,7 +12,7 @@ export const workshops = ['🏕', '🪓', '🌾'];
 export const cultivos = ['🏕', '🌱', '🌾'];
 export const warriors = ['🥷🏻', '🧎🏻‍️', '🧙', '🏹', '🗼', '👸', '🤴'];
 export const levels = ['👼', '👩‍🌾', '👩‍🚒', '🧝', '🥷🏻', '🧙', '👸', '🤴', '🧖🏻‍', '🧑‍🚀'];
-export const tools = ['🔧', '🔨', '⚒', '🛠', '⛏', '🛡', '⚔', '️🗡', '🔪', '🪓'];
+export const tools = ['🔧', '🔨', '🛠', '⛏', '🛡', '⚔️', '️🗡', '🔪', '🪓'];
 export const warriors2 = ['🏰', '🏇', '🤺', '👸', '🤴', '🥷🏻'];
 export const warriors3 = ['🧜🏻‍️', '🧞', '️🦹🏼‍', '️👩🏼‍🚒', '👷‍', '️🧕', '🥷🏻'];
 export const fruits = ['🍊', '🫐', '🌽', '🥦', '🍓️', '🍑', '🍏'];
@@ -100,8 +100,10 @@ export const resMapping = {
 };
 
 export const natureToResource = (icon) => {
-  if (mountains.includes(icon)) {
+  if (mountains.concat(flowers).includes(icon)) {
     return '⛏';
+  } else if (farm.includes(icon)) {
+    return '🔪';
   } else if (trees.includes(icon)) {
     return '️🪓';
   } else if (flowers.includes(icon)) {

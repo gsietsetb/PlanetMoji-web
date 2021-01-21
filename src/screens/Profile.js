@@ -1,18 +1,21 @@
+import {useNavigation} from '@react-navigation/core';
 import C, {apply} from 'consistencss';
 import {observer} from 'mobx-react-lite';
 import React from 'react';
-import {SafeAreaView, Text, TouchableOpacity, View} from 'react-native';
-import {ProgressBar} from 'react-native-web';
+import {FlatList, ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import {profile} from '../App';
-/*import {Categories} from 'react-native-emoji-selector';*/
-/*import Icon from 'react-native-vector-icons/FontAwesome';*/
-import Box, {ResourcesMap} from '../comp/Box';
-import {bordColor, colors, fonts, isWeb} from '../gStyles';
-import {levels} from '../stores/sets';
+import Box, {Badge, ResourcesMap, Tag} from '../comp/Box';
+import {TrackBar} from '../comp/ProgressBar';
+import {bordColor, colors, deviceWidth, fonts, gradGold, isWeb, shadow, textSize} from '../gStyles';
+import {nav, screens} from '../routes';
+import {levels, tools} from '../stores/sets';
 
 export default observer(() => {
+  const levProgress = profile.level / 10;
+  const levColor = gradGold(levProgress).toString();
+  const useNav = !isWeb && useNavigation();
   return (
-    <SafeAreaView style={apply(C.bgWhite, C.py16, C.flex)}>
+    <ScrollView contentContainerStyle={apply(C.bgWhite, C.py16, C.itemsCenter)}>
       {/**Emoji setter*/}
       <TouchableOpacity
         onPress={() => profile.eMojiModal.showModal()}
@@ -21,71 +24,113 @@ export default observer(() => {
         {/**Flag*/}
         <TouchableOpacity
           onPress={() => profile.flagModal.showModal()}
-          style={apply(C.selfCenter, C.bgWhite, bordColor(colors.sand, 3), C.radius6, C.absolute, C.top13, C.left16)}>
+          style={apply(
+            C.selfCenter,
+            C.bgWhite,
+            C.shadowMd,
+            /*bordColor(colors.sand, 3),*/ C.radius6,
+            C.absolute,
+            C.top13,
+            C.left16,
+          )}>
           <Text style={apply(C.font9)}>{profile.flag}</Text>
         </TouchableOpacity>
       </TouchableOpacity>
-      <Text style={apply(fonts.title1, C.my2, C.selfCenter)}>{profile.username}</Text>
+      <Text style={apply(fonts.title2, C.my2, C.selfCenter)}>{profile.username}</Text>
+
       {/**Level*/}
-      <View style={apply(C.row, C.m1, C.itemsCenter)}>
+      <View style={apply(C.row, C.my2, C.itemsCenter)}>
         <Box icon={'⭐️️'} text={profile.level} value={'/ 10'} border={false} />
-        <View>
-          {isWeb && (
-            <ProgressBar
-              progress={profile.level * 10}
-              style={apply(C.p4)}
-              height={40}
-              noFlex={'75%'}
-              trackColor={colors.white}
-              backgroundColor={colors.paleGreyThree}
-            />
-          )}
-          <View style={apply(C.row, C.absolute)}>
-            {levels.map((item, index) => (
-              <Text style={apply(C.font8, C.flex)}>{item}</Text>
-            ))}
-          </View>
-        </View>
+        <TrackBar progress={levProgress} colAccent={levColor} maxWidth={deviceWidth * 0.7} height={20} />
       </View>
+
+      {/**Icons associated to Level*/}
+      <View style={apply(C.row, C.mb3, isWeb && C.shadowSm, C.p2, C.radius2, shadow(levColor, 4))}>
+        {levels.map((item, index) => (
+          <Text
+            style={apply(
+              C.font8,
+              C.flex,
+              C.alignCenter,
+              index === profile.level - 1 && [C.radius4, bordColor(levColor, 2)],
+            )}>
+            {item}
+          </Text>
+        ))}
+      </View>
+
       {/**Score*/}
       <View style={apply(C.row, C.my3, C.selfCenter)}>
-        {/*<Box icon={setIcon('🪙')} border={false} />*/}
-        {/*<View>*/}
-        {isWeb && (
-          <ProgressBar
-            progress={(profile.score / Math.pow(10, profile.level)) * 100}
-            trackColor={colors.paleGrey}
-            noFlex={'92%'}
-            animated={!isWeb}
-            height={28}
-            backgroundColor={colors.water}
-          />
-        )}
-        <View style={apply(C.row, C.absolute, C.left_2)}>
-          <Box
-            icon={'🔥'}
-            text={profile.scoreForm}
-            bg={false}
-            value={'/ ' + profile.remainingScoreForm}
-            border={false}
-          />
-        </View>
-        {/*<View style={apply(C.row, C.m1, C.absolute)}>
-            {_.range(10).map((item, index) => (
-              <Text style={apply(C.font6, C.flex)}>🔥</Text>
-            ))}
-          </View>*/}
-        {/*</View>*/}
+        <Box
+          icon={'🔥'}
+          text={profile.scoreForm}
+          bg={colors.fire}
+          value={'/ ' + profile.remainingScoreForm}
+          border={false}
+        />
+        <TrackBar
+          progress={profile.score / Math.pow(10, profile.level)}
+          colAccent={colors.fire}
+          maxWidth={deviceWidth * 0.7}
+          height={20}
+        />
       </View>
       {/**Resoruces*/}
-      <Text style={apply(fonts.subtitle, C.mt8, C.mb2, C.textLeft)}>Resources: </Text>
+      <Text style={apply(fonts.title2, C.mt8, C.mb2, C.textLeft)}>Resources </Text>
       <ResourcesMap />
-      {/*<Text style={apply(fonts.subtitle, C.mt8, C.mb2, C.textLeft)}>Resources: </Text>
-      <View style={apply(C.row, C.mb8)}>
-        {profile.resources.map(({value, icon}) => (
-          <ProfileRow icon={icon} value={value} />
-        ))}
-      </View>*/}
+
+      {/**Buildings*/}
+      <Text style={apply(fonts.title2, C.mt8, C.mb2, C.textLeft)}>🏠 Buildings </Text>
+      <FlatList
+        horizontal
+        data={Object.entries(profile.buildingsList)}
+        ListEmptyComponent={
+          <Tag text={'➕ Build 🧱'} col={colors.salmon} onPress={() => nav(screens.Village.name, useNav)} />
+        }
+        keyExtractor={(item) => item[0]}
+        renderItem={({item}) => (
+          <View style={C.m4}>
+            <Text style={textSize.L}>{item[0]}</Text>
+            {item[1] > 1 && <Text style={fonts.subtitle}>{item[1]}</Text>}
+            <Badge text={'⚔️'} isBig left top />
+          </View>
+        )}
+      />
+
+      {/**Units*/}
+      <Text style={apply(fonts.title2, C.mt8, C.mb2, C.textLeft)}>🥷🏻 Units </Text>
+      <FlatList
+        horizontal
+        data={Object.entries(profile.units)}
+        keyExtractor={(item) => item[0]}
+        ListEmptyComponent={
+          <Tag text={'➕ Recruit 🏋'} col={colors.blue} onPress={() => nav(screens.Recruit.name, useNav)} />
+        }
+        renderItem={({item}) => (
+          <View style={C.m4}>
+            <Text style={textSize.Md}>{item[0]}</Text>
+            <TrackBar progress={levProgress} />
+            {item[1] > 1 && <Text style={fonts.subtitle}>{item[1]}</Text>}
+          </View>
+        )}
+      />
+
+      {/**Units*/}
+      <Text style={apply(fonts.subtitle, C.mt8, C.mb2, C.textLeft)}>⚙️ Special features </Text>
+      <FlatList
+        /*numColumns={6}*/
+        horizontal
+        data={tools}
+        keyExtractor={(item) => item[0]}
+        renderItem={({item}) => (
+          <View style={[C.m4, C.shadowMd, shadow(colors.blue)]}>
+            <Text style={textSize.Sm}>{item}</Text>
+            {/*<TrackBar progress={levProgress} />
+            {item[1] > 1 && <Text style={fonts.subtitle}>{item[1]}</Text>}*/}
+          </View>
+        )}
+      />
+
       {/**Header*/}
       {/*<Text style={apply(C.font10, C.my6, C.selfCenter)}>🅿️L🅰️NE™️🌏Jℹ️</Text>*/}
       {/*<Text style={apply(C.font5, C.mt4, C.mb_2, C.selfCenter)}>🅿🅻🅰🅽🅴🆃</Text>
@@ -93,7 +138,7 @@ export default observer(() => {
       {/*<AddEmojiModal category={Categories.flag} onSet={(emoji) => profile.setFlag(emoji)} modal={profile.flagModal} />
       <AddEmojiModal category={Categories.flag} onSet={(emoji) => profile.setMoji(emoji)} modal={profile.eMojiModal} />
    */}
-    </SafeAreaView>
+    </ScrollView>
   );
 });
 
