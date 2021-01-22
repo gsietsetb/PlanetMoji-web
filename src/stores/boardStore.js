@@ -52,7 +52,7 @@ export const boardsMap = {
   /**Harvest*/
   HARVEST: {
     id: 4,
-    initMoves: 8,
+    initMoves: 16,
     bombs: 3,
     shuffle: 1,
     icon: () => pickRandom(harvest, 1),
@@ -101,15 +101,11 @@ export const BoardStore = (boardMap = boardsMap.WORLD, size = CHESS_SIZE, isEmpt
       isEvil = false,
       flag = isEvil ? '🇪🇸' : profile.flag,
     }) {
-      console.log('before all good', icon, id, overwrite);
       let pos = id;
       if (!overwrite) {
-        console.log('erhjo THIS NEVER BEEN EXECUTED; RIGHT?');
         pos = this.findNextEmpty(id);
       }
       // overwrite ? id : this.findNextEmpty(id);
-      console.log('rea all good', pos);
-
       const currCell = this.cells[pos];
       console.log('setting', icon, id, currCell, unitIcon, pos, id, overwrite); // this.findNextEmpty(id));
       if (icon) {
@@ -164,10 +160,14 @@ export const BoardStore = (boardMap = boardsMap.WORLD, size = CHESS_SIZE, isEmpt
       this.reassignCells({newIcons: Object.keys(unitsMap), currIcon: matchIcon});
       this.remMoves--;
     },
+    /**In order to highgligth the matching one*/
+    currResource: '',
+    setCurrResource(res) {
+      this.currResource = res;
+    },
     collectCells(matchIcon = '🔥', isResource) {
-      console.log('re', matchIcon, isResource);
       const comboSize = this.matchRecursiveAdjIds.length;
-      console.log('cobmo', comboSize, this.matchRecursiveAdjIds);
+      console.log('wellknown we got: ', matchIcon, isResource, comboSize, this.currResource);
 
       /**Updates harvestCombo*/
       if (comboSize > 6) {
@@ -176,7 +176,6 @@ export const BoardStore = (boardMap = boardsMap.WORLD, size = CHESS_SIZE, isEmpt
           this.setComboRecord(comboSize, matchIcon);
         }
       }
-      console.log('this was also fine! :ok: ', comboSize);
 
       profile.harvestResource(matchIcon, comboSize, isResource);
       if (isResource) {
@@ -219,26 +218,9 @@ export const BoardStore = (boardMap = boardsMap.WORLD, size = CHESS_SIZE, isEmpt
       );
     },
     reassignCells({cells = this.matchRecursiveAdjIds, newIcons = harvest, currIcon = '🔥'}) {
-      console.log('ogingt to cargarme: ', cells, newIcons, currIcon);
+      console.log('Reasigning cells: ', cells, newIcons, currIcon);
       const filterSet = newIcons.filter((icon) => icon !== currIcon);
-
       cells.forEach((currCellId) => this.cells[currCellId].setIcon(pickRandom(filterSet, 1))); //this.setCell({icon: '💎', id: currCellId}));
-      /*for (let cellsKey in cells) {
-        console.log('oim ina loop:: ', cellsKey, filterSet, pickRandom(filterSet, 1));
-        this.setCell({
-          icon: '⚡️', //pickRandom(filterSet, 1),
-          overwrite: true,
-          id: 25,
-        });
-      }*/
-      /*cells.map((cur) => {
-        console.log('oim ina loop:: ', cur, filterSet, pickRandom(filterSet, 1));
-        this.setCell({
-          icon: '⚡️', //pickRandom(filterSet, 1),
-          overwrite: true,
-          id: 25,
-        });
-      });*/
     },
     randomMove() {
       const enemies = this.cells.filter(({unit, isEvil}) => unit && isEvil);

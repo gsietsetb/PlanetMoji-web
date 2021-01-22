@@ -41,9 +41,9 @@ export const ProfileStore = (isIA = false, level = 1) =>
     get emoji() {
       return levels[this.level - 1];
     },
-    setMoji(emoji) {
+    /*setMoji(emoji) {
       this.emoji = emoji;
-    },
+    },*/
     flag: '🇪🇸',
     setFlag(emoji) {
       this.flag = emoji;
@@ -57,7 +57,7 @@ export const ProfileStore = (isIA = false, level = 1) =>
     get remainingScoreForm() {
       return numFormat(Math.pow(10, this.level));
     },
-    resources: {'💎': 150, '🪵': 150, '️🥩': 150, '🪨': 150},
+    resources: {'💎': 150, '🪵': 150, '🍖': 150, '🪨': 150},
     modal: modalStore(),
 
     /**Units*/
@@ -65,7 +65,7 @@ export const ProfileStore = (isIA = false, level = 1) =>
     enemy: {},
 
     /**todo move to board*/
-    collected: {'💎': 0, '🪵': 0, '🥩': 0, '🪨': 0, '🔥': 0},
+    collected: {'💎': 0, '🪵': 0, '🍖': 0, '🪨': 0, '🔥': 0},
     buildingsList: [],
     /*enemyUnits: _.range(level - 1).map((item) =>
                                                                                                                                                                                                                                                               Object.keys(unitsMap).map((currItem) => profile.battle.setCellIcon(currItem)),
@@ -105,7 +105,6 @@ export const ProfileStore = (isIA = false, level = 1) =>
       }
     },
     buyBuilding(buildIcon = buildingsMap['⛺️'], board = this.boards.worldMap) {
-      console.log('_createPadding, ', buildIcon);
       objAdd(this.buildingsList, buildIcon);
       const {cost, score, skills} = buildingsMap[buildIcon];
 

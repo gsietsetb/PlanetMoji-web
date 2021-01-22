@@ -2,7 +2,7 @@ import C, {apply} from 'consistencss';
 import _ from 'lodash';
 import React from 'react';
 import {Image, Text, TouchableOpacity, View} from 'react-native';
-import {badgeWrapper, bgColor, bordColor, cell, colors, gradLife, shadow, textSize} from '../gStyles';
+import {badgeWrapper, bgColor, cell, colors, gradLife, shadow, textSize} from '../gStyles';
 import {TrackBar} from './ProgressBar';
 
 export default ({
@@ -17,7 +17,7 @@ export default ({
   iconOpacity = 1,
   size = cell.Md,
   iconSize = textSize.L,
-  selColor = colors.water,
+  bordColor = colors.water,
   showRes = false,
   showFlag = false,
   withFlex = false,
@@ -45,7 +45,7 @@ export default ({
             C.itemsCenter,
             C.justifyCenter,
             {opacity: opacity},
-            /*isCurrent && bordColor(selColor, 2),*/
+            /*isCurrent && bordColor(bordColor, 2),*/
           )}
         />
       )}
@@ -56,7 +56,7 @@ export default ({
           C.itemsCenter,
           C.justifyCenter,
           C.contentCenter,
-          img && isCurrent && bordColor(selColor, 2),
+          img && isCurrent && bordColor(bordColor, 2),
           img && wrapStyle,
         )}>
         <Text style={apply(iconSize, C.maxh12, C.selfCenter)}>{_.isEmpty(item.icon) ? icon : item.icon}</Text>

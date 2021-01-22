@@ -27,7 +27,7 @@ export const CollectTools = () => <Collect currentBoard={profile.boards.toolsMap
   return (
     <SafeAreaView style={apply(C.py8, C.itemsCenter, bgColor(colors.white), C.flex)}>
       {/!**Resources*!/}
-      <StatsMap profile={profile} />
+      <StatsMap currProfile={profile} />
       <ResourcesMap resources={profile.resources} withBord={false} />
 
       {currentBoard && (

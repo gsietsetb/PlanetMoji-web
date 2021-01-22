@@ -15,6 +15,7 @@ export const colors = {
   wood: '#804000',
   salmon: '#c14e2b',
   flame: '#c14e2b',
+  enemy: '#c12a48',
   fire: '#db8d2d',
   salmon40: '#c14e2b20',
   blueGrey: '#9399ac',

@@ -49,7 +49,7 @@ export default observer(() => {
 
       {/**Resources*/}
       <View style={absCenter}>
-        <StatsMap profile={profile} showPopulation />
+        <StatsMap currProfile={profile} showPopulation />
         <ResourcesMap resources={profile.resources} />
         <CollapsableCards onPress={(item) => profile.buyBuilding(item, currentBoard)} />
         {/*<FlatList

@@ -56,7 +56,6 @@ export const WebNavigation = ({currScreen, onSet}) => (
 );
 
 export const nav = (screen, useNav) => {
-  console.log('teho', screen, useNav);
   if (isWeb) {
     /*profile.setCurrentScreen(screen);*/
     profile.modal.showModal();

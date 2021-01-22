@@ -5,7 +5,7 @@ import {observer} from 'mobx-react-lite';
 import React, {useState} from 'react';
 import {FlatList, SafeAreaView, Text, View} from 'react-native';
 import {profile} from '../App';
-import {CloseButton, ResourcesMap, StatsMap, Tag} from '../comp/Box';
+import {CloseButton, Column, ResourcesMap, StatsMap, Tag} from '../comp/Box';
 import Cell from '../comp/Cell';
 import {bgColor, bordColor, cell, colors, deviceWidth, fonts, isBig, isIOS, isWeb, shadow, textSize} from '../gStyles';
 import {CHESS_SIZE} from '../stores/boardStore';
@@ -25,14 +25,8 @@ export default observer(
 
     const tryCollect = (index, icon) => {
       currentBoard.setCurrent(index);
-      console.log(
-        'VeryHigh ,',
-        currentBoard.validMatch,
-        currentBoard.matchRecursiveAdjIds,
-        currentBoard.adjacentIds,
-        currentBoard.adjacentDiagIds,
-      );
       if (currentBoard.validMatch) {
+        currentBoard.setCurrResource(icon);
         blinkBg(() => currentBoard.collectCells(icon, isResource));
       }
     };
@@ -42,15 +36,19 @@ export default observer(
       setTimeout(() => {
         onAfter();
         setShowMatching(false);
-      }, 500);
+      }, 600);
     };
 
     return (
       <SafeAreaView style={apply(isIOS && C.py4, C.hFull, C.itemsCenter, bgColor(colors.white))}>
         {!isWeb && <CloseButton navigate={goBack} />}
         {/**Resources*/}
-        <StatsMap profile={profile} />
-        <ResourcesMap resources={profile.resources} withBord={false} highlightIcon={bombIcon} />
+        <StatsMap currProfile={profile} />
+        <ResourcesMap
+          resources={profile.resources}
+          withBord={false}
+          highlightIcon={showMatching ? currentBoard.currResource : ''}
+        />
 
         {cells && (
           <FlatList
@@ -58,43 +56,41 @@ export default observer(
             numColumns={CHESS_SIZE}
             style={apply(C.my6, remMoves < 1 && C.opacity25)}
             contentContainerStyle={[isBig && C.p2]}
-            extraData={cells}
+            extraData={currentBoard.currCellId}
             scrollEnabled={false}
-            renderItem={({item, index}) => (
-              <Cell
-                size={cell.L}
-                iconSize={isBig ? textSize.XL : textSize.L}
-                bg={colors.white}
-                withFlex={!isWeb}
-                withTransp={false}
-                wrapStyle={[
-                  bordColor(colors.water, isIOS ? 0.5 : 1),
-                  isWeb ? C.m1 : C.px1,
-                  {margin: 2},
-                  C.radius3,
-                  !isIOS && showMatching && currentBoard.shouldHighlight(index) && bgColor(colors.water + '20'),
-                  shadow(colors.blue, showMatching && currentBoard.shouldHighlight(index) ? 14 : 3),
-                ]}
-                index={index}
-                onPress={() => remMoves > 0 && tryCollect(index, item.icon)}
-                item={item}
-              />
-            )}
+            renderItem={({item, index}) => {
+              const highlight = showMatching && currentBoard.shouldHighlight(index);
+              return (
+                <Cell
+                  size={cell.L}
+                  iconSize={isBig ? textSize.XL : textSize.L}
+                  withFlex={!isWeb}
+                  withTransp={false}
+                  cShadow={shadow(highlight ? colors.fire : colors.blue, highlight ? 15 : 3)}
+                  cBord={bordColor(highlight ? colors.fire : colors.water, isIOS ? /*highlight ? 3 :*/ 0.5 : 1)}
+                  bg={!isIOS && highlight ? colors.fire + '60' : colors.white}
+                  wrapStyle={C.radius3}
+                  index={index}
+                  onPress={() => remMoves > 0 && tryCollect(index, item.icon)} //currentBoard.setCurrent(index)}
+                  item={item}
+                />
+              );
+            }}
           />
         )}
 
-        {/*{!withBonus && (
+        {!withBonus && (
           <View style={apply(C.row, C.mb2)}>
-            *Moves
-            <Column isBig text={'⚡️'} val={'Moves (' + remMoves + ')'} />
-            *Shuffle
+            {/**Moves*/}
+            {/*<Column isBig text={'⚡️'} val={'Moves (' + remMoves + ')'} />*/}
+            {/**Shuffle*/}
             <Column
               isBig
               text={'🔄'}
               val={'Shuffle (' + remShuffles + ')'}
               onPress={remShuffles > 0 && (() => currentBoard.shuffle())}
             />
-            *Bombs
+            {/**Bombs*/}
             <Column
               isBig
               onPress={remBombs > 0 && (() => blinkBg(() => currentBoard.explodeAll()))}
@@ -102,7 +98,7 @@ export default observer(
               val={'Explode (' + remBombs + ')'}
             />
           </View>
-        )}*/}
+        )}
         {/*/*: (
           <CollectList units={Object.entries(profile.collected)} />
         )}*/}

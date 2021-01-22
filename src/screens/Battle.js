@@ -12,44 +12,11 @@ import {bordColor, cell, colors, fonts, imgs, isIOS, isTabl, isWeb, shadow, text
 import {CHESS_SIZE} from '../stores/boardStore';
 import {unitsMap} from '../stores/sets';
 
-/*const Warriors = ({units = Object.entries(profile.units)}) =>
-  units.map(([key, value]) => (
-    <View style={apply(C.itemsCenter, isTabl && C.row, C.selfStart, C.py4, C.maxw12)}>
-      <Text style={C.font9}>🎲</Text>
-      {value >= 3 ? (
-        <Text style={apply(C.font12)}>{key}</Text>
-      ) : (
-        _.range(value).map((item) => <Text style={apply(C.font12)}>{key}</Text>)
-      )}
-      <ProgressBar backgroundColor={colors.grass} progress={Math.random() * 100} noFlex={'80%'} height={12} />
-      {value >= 3 && <Text style={apply(C.font4)}>x{value}</Text>}
-    </View>
-  ));*/
-
-/*const Graveyard = () =>
-  Object.keys(profile.units).map((item) => (
-    <Text style={C.font9}>
-      {item} x{profile.units[item]}
-    </Text>
-  ));*/
-
-const Recruit = () => (
-  <FlatList
-    data={Object.keys(unitsMap)}
-    style={apply(C.p2, C.mb12 /*C.flex, isTabl ? C.top_16 : C.pb_6*/)}
-    keyExtractor={(item) => item.key}
-    horizontal={!isTabl}
-    numColumns={isTabl && 2}
-    extraData={profile.level}
-    renderItem={({item, index}) => <AddCard index={index} item={item} onSet={() => profile.buyUnit(item)} />}
-  />
-);
-
 export default observer(() => {
   const currentBoard = profile.boards.battleMap;
   const [myTurn, setMyTurn] = useState(true);
   const [attack, setAttack] = useState(false);
-  /*const nUnits = Object.keys(profile.units).length;*/
+  const [moveMode, setMoveMode] = useState(false);
 
   useEffect(() => {
     if (!currentBoard.cells[0].icon) {
@@ -74,7 +41,7 @@ export default observer(() => {
   return (
     <SafeAreaView style={!isTabl && !isIOS && C.py10} contentContainerStyle={C.itemsCenter}>
       {/**Resources*/}
-      <StatsMap profile={profile} showPopulation />
+      <StatsMap currProfile={profile} showPopulation />
       <ResourcesMap resources={profile.resources} />
       {/*<Text>
         {currentBoard.currCellId} {attackMode.toString()}
@@ -86,11 +53,13 @@ export default observer(() => {
             data={currentBoard.cells}
             style={apply(C.radius2, !isTabl ? C.mt6 : C.mt_16)}
             numColumns={CHESS_SIZE}
-            contentContainerStyle={apply(C.radius2)}
+            /*contentContainerStyle={apply(C.radius2)}*/
             extraData={currentBoard.currCellId}
             scrollEnabled={false}
             renderItem={({item, index}) => {
               const availMove =
+                moveMode &&
+                !attack &&
                 myTurn &&
                 currentBoard.isCurrUnit &&
                 !item.icon &&
@@ -98,6 +67,8 @@ export default observer(() => {
                 currentBoard.adjacentDiagIds.includes(index);
 
               const availAttack =
+                moveMode &&
+                !attack &&
                 myTurn &&
                 currentBoard.isCurrUnit &&
                 item.isEvil &&
@@ -109,8 +80,8 @@ export default observer(() => {
                 ? colors.grass
                 : item.unit
                 ? item.isEvil
-                  ? colors.salmon /*+ '90'*/
-                  : colors.blue /*+ '90'*/
+                  ? colors.enemy /*'red'*/ /*colors.enemy*/
+                  : colors.water /*+ '90'*/
                 : 'transparent';
 
               return (
@@ -121,14 +92,15 @@ export default observer(() => {
                   availAttack={availAttack && '⚔️'}
                   size={isWeb ? cell.Md : cell.Sm}
                   iconSize={isWeb ? textSize.L : textSize.L}
-                  bg={highlightColor}
+                  cShadow={shadow(highlightColor, 8)}
+                  bg={availMove ? colors.grass : 'transparent' /*: availAttack && 'red'*/}
+                  cBord={bordColor(
+                    isSel ? colors.water : availMove ? colors.grass : availAttack ? colors.enemy : 'transparent',
+                    availAttack ? 1 : item.unit ? 0 : isSel ? 3 : 2,
+                  )}
                   index={index}
                   icon={availMove && currentBoard.currCell.icon}
-                  wrapStyle={[
-                    (availMove || availAttack) && bordColor(availMove ? colors.grass : colors.salmon, isSel ? 3 : 1),
-                    C.flex,
-                    item.unit && C.radius2,
-                  ]}
+                  wrapStyle={C.radius2}
                   onPress={() => {
                     if (availMove) {
                       /**Move*/
@@ -137,10 +109,13 @@ export default observer(() => {
                       currentBoard.setCurrent(index);
                       setAttack(false);
                       enemyAttack();
+                    } else if (isSel) {
+                      setMoveMode(!moveMode);
                     } else if (availAttack) {
                       setAttack({evil: item.unit, own: currentBoard.currCell.unit});
                     } else {
                       currentBoard.setCurrent(index);
+                      setMoveMode(false);
                       setAttack(false);
                     }
                   }}
@@ -156,25 +131,27 @@ export default observer(() => {
           attack ? (
             <View
               style={[C.row, C.m4, C.itemsCenter, /*bordColor(colors.wood, 2), C.radius2,*/ C.p2, C.justifyBetween]}>
-              <AddCard item={attack.own.icon} own border={colors.salmon} currLife={12} />
+              {/**Own unit*/}
+              <AddCard item={attack.evil.icon} own isFight border={colors.enemy} currLife={12} />
               <View style={[C.itemsCenter, C.contentCenter]}>
                 <View style={[C.row]}>
                   {/*<Text style={C.mx4}>◀️</Text>*/}
-                  <Text style={[fonts.title1]}> Fight!</Text>
                   {/*<Text>▶️</Text>*/}
                 </View>
                 <View style={[C.row, C.itemsCenter]}>
                   <SpinIcon textStyle={[textSize.L, shadow(colors.salmon, 7), C.p4]} />
-                  <Text style={textSize.L}>🤼‍</Text>
-                  <SpinIcon textStyle={[textSize.L, shadow(colors.blue, 4), C.m4]} />
+                  {/*<Text style={[textSize.L, C.absolute, C.right12, C.top_16]}>🆚</Text>*/}
+                  <Text style={[textSize.L, C.absolute, C.left11, C.top_4]}>🤼‍</Text>
+                  {/**Evil*/}
+                  <SpinIcon textStyle={[textSize.L, shadow(colors.blue, 7), C.m2]} />
                 </View>
               </View>
-              <AddCard item={attack.evil.icon} own currLife={6} />
+              <AddCard item={attack.own.icon} border={colors.blue} own currLife={6} />
             </View>
           ) : (
             <>
               {/*<Tag col={colors.blue} text={'💰 Buy units, then ⚡️ Move , ⚔️ Attack '} />*/}
-              <Text style={[fonts.subtitle, C.textBlue, C.my4]}>💰 Buy units, then ⚡️ Move, ⚔️ Attack </Text>
+              {/*<Text style={[fonts.subtitle, C.textBlue, C.my4]}>💰 Buy units, then ⚡️ Move, ⚔️ Attack </Text>*/}
               <FlatList
                 data={Object.keys(unitsMap)}
                 style={apply(C.p2, C.mb12)}

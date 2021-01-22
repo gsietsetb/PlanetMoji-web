@@ -141,12 +141,13 @@ export const TrackBar = ({
   wrapStyle,
   grad = gradGold,
   colBg = colors.paleGreyTwo,
+  colBord = colors.water,
   colAccent = grad(progress).toString(),
 }) => (
   <View style={[wrapStyle, C.selfCenter]}>
-    <View style={apply(C.radius4, bgColor(colBg), bordColor(colAccent, 1), {width: maxWidth, height: height + 1})} />
+    <View style={apply(C.radius4, bgColor(colBg), bordColor(colBord, 1), {width: maxWidth, height: height + 1})} />
     <View
-      style={apply(C.absolute, bgColor(colAccent), shadow(colAccent), C.radius4, {
+      style={apply(C.absolute, bgColor(colAccent), shadow(colBord), C.radius4, {
         width: maxWidth * (progress > 1 ? progress / 100 : progress),
         height: height,
       })}

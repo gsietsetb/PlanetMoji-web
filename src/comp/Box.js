@@ -12,17 +12,17 @@ const Box = ({icon, value, text, border = true, horiz = true, bg = true, highlig
         horiz && C.row,
         C.mx2,
         C.itemsCenter,
-        (border || highlightIcon) && bordColor(highlightIcon ? colors.salmon : colors.sand, highlightIcon ? 4 : 2),
+        border && bordColor(colors.sand, 2),
         bg && C.bgWhite,
         C.px1,
         C.justifyBetween,
         !border && !horiz && C.w18,
-        shadow(colors.sand),
+        shadow(highlightIcon ? colors.fire : colors.sand, highlightIcon && 8),
         C.radius2,
       )}>
-      <Text style={apply(C.font6, C.selfCenter, C.mr1)}>{icon}</Text>
+      <Text style={apply(highlightIcon ? C.font9 : C.font6, C.selfCenter, C.mr1)}>{icon}</Text>
       <View style={horiz && C.row}>
-        <Text numberOfLines={1} style={apply(fonts.subtitle, C.selfCenter)}>
+        <Text numberOfLines={1} style={apply(highlightIcon ? C.font30 : fonts.subtitle, C.selfCenter)}>
           {text}
         </Text>
         <Text numberOfLines={1} style={apply(fonts.body1, C.selfCenter)}>
@@ -87,37 +87,32 @@ export const VertInfo = ({text, val, descr, isBig = false, onPress = () => {}}) 
     {/*<Text style={apply(isBig ? textSize.Md : textSize.Xs)}>{val}</Text>*/}
   </TouchableOpacity>
 );
-export const StatsMap = ({profile, showPopulation = false}) => (
+export const StatsMap = ({currProfile, showPopulation = false}) => (
   <View style={apply(C.row, C.m4, C.selfCenter)}>
-    <Box icon={'🔥'} text={profile.scoreForm} value={'/ ' + profile.remainingScoreForm} />
-    <Box icon={'⭐️'} text={profile.level} value={'/10'} />
-    {showPopulation && <Box icon={'👨‍👩‍👧‍👦'} text={profile.currPopulation} value={'/' + profile.maxPopulation} />}
+    <Box icon={'🔥'} text={currProfile.scoreForm} value={'/ ' + currProfile.remainingScoreForm} />
+    <Box icon={'⭐️'} text={currProfile.level} value={'/10'} />
+    {showPopulation && <Box icon={'👨‍👩‍👧‍👦'} text={currProfile.currPopulation} value={'/' + currProfile.maxPopulation} />}
+  </View>
+);
+
+export const ResourcesMap = ({resources = profile.resources, withBord = false, highlightIcon}) => (
+  <View style={apply(C.row, C.mb4, C.selfCenter, C.radius2)}>
+    {Object.entries(resources)
+      .filter(([icon, value]) => !!value)
+      .map(([icon, value]) => (
+        <Box icon={icon} value={numFormat(value)} border={withBord} highlightIcon={highlightIcon === icon} />
+      ))}
   </View>
 );
 
 export const CloseButton = ({navigate, onPress}) => (
   <Text
-    style={apply(
-      C.absolute,
-      C.right4,
-      isIOS ? C.top12 : C.top4,
-      textSize.Md,
-      C.p2,
-      C.radius4,
-      shadow(colors.salmon, 2),
-    )}
+    style={apply(C.absolute, C.right4, isIOS ? C.top12 : C.top4, textSize.L, C.p2, C.radius4, shadow(colors.salmon, 2))}
     onPress={onPress || (() => navigate())}>
     ️️⤬
   </Text>
 );
 
-export const ResourcesMap = ({resources = profile.resources, withBord = false, highlightIcon}) => (
-  <View style={apply(C.row, C.mb4, C.selfCenter, C.radius2)}>
-    {Object.entries(resources).map(([icon, value]) => (
-      <Box icon={icon} value={numFormat(value)} border={withBord} highlightIcon={highlightIcon === icon} />
-    ))}
-  </View>
-);
 /*const Tabs = ({tabs = Object.values(battleModes), setMode, currentTab = 0}) => (
   <View style={apply(C.row, C.mt4, C.justifySpaced, C.itemsCenter)}>
     {tabs.map(({title, Comp}, index) => (

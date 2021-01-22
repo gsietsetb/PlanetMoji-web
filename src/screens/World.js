@@ -50,19 +50,20 @@ export default observer(() => {
             style={apply(isIOS && C.top_12 /*!isWeb && minH100(1.2)*/)}
             numColumns={xCells()}
             scrollEnabled={false}
-            extraData={currentBoard.currCellId}
+            extraData={[currentBoard.currCellId, profile.buildingsList]}
             keyExtractor={(item) => item.id}
             renderItem={({item, index}) => (
               <Cell /*img={isWeb ? imgs.grassText : imgs.grass}*/ /*bg={item.bg}*/ ///*index % 5 === 0 ?*/ item.icon ? colors.groundSand : colors.sand} //item.boardMap.terrain.bg}
                 opacity={isWeb ? 0.55 : isIOS ? 0.7 : 0.6} //!isWeb && europeAllow.includes(index) ? 0.75 : 0.6}
                 bg={!isWeb && (isIOS ? colors.water : colors.groundSand)}
                 img={isIOS ? imgs.grass : imgs.grassCut}
+                cShadow={shadow(item.building ? (item.isEvil ? colors.enemy : colors.blue) : 'transparent', 8)}
                 index={index}
                 showFlag
                 showRes
                 onPress={() => {
                   currentBoard.setCurrent(index);
-                  if (currentBoard.cells[index].ourBuilding) {
+                  if (item.building && !item.isEvil) {
                     nav(screens.Village.name, useNav);
                   } else if (item.availResources) {
                     nav(screens.Fruit.name, useNav);
@@ -89,7 +90,7 @@ export default observer(() => {
 
       {/**Resources*/}
       <View style={absCenter}>
-        <StatsMap profile={profile} />
+        <StatsMap currProfile={profile} />
         <ResourcesMap resources={profile.resources} />
         <CollapsableCards onPress={(item) => profile.buyBuilding(item)} />
       </View>

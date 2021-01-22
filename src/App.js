@@ -31,11 +31,10 @@ const App: () => React$Node = observer(() => {
   /*const [isLoading, setIsLoading] = useState(true);*/
   let Comp = screens[profile.currentScreen].Comp;
   autorun(() => {
-    console.log('treggt', profile.currentScreen);
     Comp = screens[profile.currentScreen].Comp;
   });
 
-  /* useEffect(() => {
+  /*useEffect(() => {
     /!**Init stores*!/
   });*/
 
@@ -43,9 +42,7 @@ const App: () => React$Node = observer(() => {
     <SafeAreaView style={apply(bgColor(colors.paleGrey))}>
       <WebNavigation currScreen={profile.currentScreen} onSet={(index) => profile.setCurrentScreen(index)} />
       {/*<Spinner speed={200} />*/}
-      <ScrollView style={apply(C.flex, C.hFull)}>
-        <Comp />
-      </ScrollView>
+      <ScrollView style={apply(C.flex, C.hFull)}>{Comp && <Comp />}</ScrollView>
       <AddEmojiModal Comp={<CollectFruit />} />
 
       {/*<Navigator />*/}

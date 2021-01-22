@@ -13,10 +13,19 @@ export const UnitStore = (unitIcon = '👩‍🌾', pos, isEvil = false) =>
     icon: unitIcon,
     cellPos: pos,
     isEvil: isEvil,
-    /*currLife: unit?.skills['❤️'] || 100,*/
+    life: unitsMap[unitIcon].skills['❤️'] || 100,
     map: null,
     get isAssigned() {
       return this.map && this.cellPos;
+    },
+    get lifePerc() {
+      return this.life / this.unit.skills['❤️'];
+    },
+    impactAttack(attack = 0) {
+      const impact = attack - this.unit.skills['🛡'];
+      if (impact > 0) {
+        this.life -= impact;
+      }
     },
     assign(map, newPos) {
       this.map = map;
@@ -64,11 +73,7 @@ export const CellStore = ({
   bg /*terrain.bg*/,
   badge,
   flag,
-  isPressable = true, //id % 6 !== 0,
   isEvil = false,
-  isUnit = false,
-  /*badge = 0,*/
-  isEmpty = false,
   complSeconds = Math.floor(Math.random() * 10),
 }) =>
   makeAutoObservable({

@@ -2,7 +2,7 @@ import C, {apply} from 'consistencss';
 import React from 'react';
 import {Text, TouchableOpacity, View} from 'react-native';
 import {profile} from '../App';
-import {BASE_PIXEL, bordColor, colors, gradLife, isWeb, textSize} from '../gStyles';
+import {BASE_PIXEL, bordColor, colors, gradLife, isWeb, shadow, textSize} from '../gStyles';
 import {unitsMap} from '../stores/sets';
 import {Column} from './Box';
 import {TrackBar} from './ProgressBar';
@@ -11,26 +11,34 @@ export default ({
   item,
   list = unitsMap,
   isBuilding = false,
-  border = colors.blue,
+  border,
   own = false,
-  currLife,
+  isFight = false,
   onSet = profile.buyUnit,
 }) => {
   const {level, cost, score, skills} = list[item];
   const tooExpensive = Object.entries(cost).some(([res, currCost], index) => currCost > profile.resources[res] || 0);
   const isReady = profile.level >= level;
   const forbidden = !isReady || tooExpensive || (!isBuilding && profile.populationExceeded);
+  const highlightColor = border || (forbidden ? colors.blueGrey : colors.blue);
   return (
     <View
-      style={apply(C.m1, own ? C.p2 : C.p1, C.bgWhite, C.radius2, bordColor(forbidden ? colors.blueGrey : border, 2))}>
+      style={apply(
+        C.m1,
+        own ? C.p2 : C.p1,
+        C.bgWhite,
+        C.radius2,
+        bordColor(highlightColor, 1),
+        shadow(highlightColor, 2),
+      )}>
       <TouchableOpacity
         activeOpacity={0.4}
         style={apply(!own && forbidden && C.opacity20, C.itemsCenter)}
         onPress={() => !forbidden && onSet(item)}>
-        <View style={apply(C.row, currLife && C.mb2)}>
+        <View style={apply(C.row, isFight && C.mb2)}>
           <Text style={apply(textSize.Xs, C.mr1)}>⭐️ {level}</Text>
           <Text style={textSize.Xs}>
-            ❤️{currLife && currLife + ' /'} {skills['❤️']}
+            ❤️{isFight && currLife + ' /'} {skills['❤️']}
           </Text>
         </View>
         {currLife && !isWeb && (
