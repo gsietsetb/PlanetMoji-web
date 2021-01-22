@@ -2,7 +2,7 @@ import C, {apply} from 'consistencss';
 import React from 'react';
 import {Text, TouchableOpacity, View} from 'react-native';
 import {profile} from '../App';
-import {BASE_PIXEL, bordColor, colors, gradLife, isWeb, shadow, textSize} from '../gStyles';
+import {BASE_PIXEL, bordColor, colors, gradLife, shadow, textSize} from '../gStyles';
 import {unitsMap} from '../stores/sets';
 import {Column} from './Box';
 import {TrackBar} from './ProgressBar';
@@ -14,6 +14,7 @@ export default ({
   border,
   own = false,
   isFight = false,
+  currLife = list[item].skills['❤️'],
   onSet = profile.buyUnit,
 }) => {
   const {level, cost, score, skills} = list[item];
@@ -41,7 +42,7 @@ export default ({
             ❤️{isFight && currLife + ' /'} {skills['❤️']}
           </Text>
         </View>
-        {currLife && !isWeb && (
+        {isFight && (
           <TrackBar
             maxWidth={20 * BASE_PIXEL}
             colAccent={gradLife(currLife / skills['❤️']).toString()}

@@ -93,7 +93,7 @@ export default observer(() => {
         <Column
           isBig
           text={'🔄'}
-          val={'Shuffle (' + remShuffles + ')'}
+          val={'Shuffle ( ' + remShuffles + ' )'}
           opac={remShuffles <= 0}
           onPress={() => remShuffles > 0 && currentBoard.shuffle()}
         />
@@ -105,7 +105,7 @@ export default observer(() => {
           text={'💉🧟'}
           col={'red'}
           toShadow
-          val={'Heal Zombies (' + remBombs + ')'}
+          val={'Heal Zombies ( ' + remBombs + ' )'}
         />
       </View>
       {/*<Text>{JSON.stringify(currentBoard.explodeCandidates)}</Text>

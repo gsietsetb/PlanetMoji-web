@@ -131,8 +131,14 @@ export default observer(() => {
           attack ? (
             <View
               style={[C.row, C.m4, C.itemsCenter, /*bordColor(colors.wood, 2), C.radius2,*/ C.p2, C.justifyBetween]}>
-              {/**Own unit*/}
-              <AddCard item={attack.evil.icon} own isFight border={colors.enemy} currLife={12} />
+              {/**Evil unit*/}
+              <AddCard
+                item={attack.evil.icon}
+                own
+                isFight
+                /*onSet={()=>currentBoard.currCell.unit.impactAttack(unitsMap[attack.evil.icon].skills['⚔️'])}*/
+                border={colors.enemy}
+              />
               <View style={[C.itemsCenter, C.contentCenter]}>
                 <View style={[C.row]}>
                   {/*<Text style={C.mx4}>◀️</Text>*/}
@@ -142,11 +148,16 @@ export default observer(() => {
                   <SpinIcon textStyle={[textSize.L, shadow(colors.salmon, 7), C.p4]} />
                   {/*<Text style={[textSize.L, C.absolute, C.right12, C.top_16]}>🆚</Text>*/}
                   <Text style={[textSize.L, C.absolute, C.left11, C.top_4]}>🤼‍</Text>
-                  {/**Evil*/}
+                  {/**Own*/}
                   <SpinIcon textStyle={[textSize.L, shadow(colors.blue, 7), C.m2]} />
                 </View>
               </View>
-              <AddCard item={attack.own.icon} border={colors.blue} own currLife={6} />
+              <AddCard
+                item={attack.own.icon}
+                isFight
+                border={colors.blue}
+                own /*onSet={()=>currentBoard.currCell.unit.impactAttack(unitsMap[attack.evil.icon].skills['⚔️'])}*/
+              />
             </View>
           ) : (
             <>
